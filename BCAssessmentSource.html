@@ -1,0 +1,256 @@
+
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta http-equiv="X-UA-Compatible" content="IE=edge" /><title>
+	e-valueBC
+</title><link href="//fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css" /><link id="evbcCSS" rel="stylesheet" href="CSS/evbc_2014.css?v1.3" /><link id="mapPopupCSS" rel="stylesheet" href="CSS/mapPopup.css?v1.3" />
+    <script type="text/javascript">
+        if (document.getElementById) { window.onload = setBackgroundImage };
+        function setBackgroundImage() {
+            var imageCount = 4;
+            bgImages = new Array("../Images/Background/farm80.jpg",
+                                "../Images/Background/golden80.jpg",
+                                "../Images/Background/vancouver80.jpg",
+                                "../Images/Background/leaves80.jpg");
+            x = (Math.floor(Math.random() * imageCount));
+            bgImage = (bgImages[x]);
+            document.getElementById("landing-background").style.backgroundImage = "url(" + bgImage + ")";
+        }
+    </script>
+    <script type="text/javascript">
+        function showWindow() {
+            var oWnd = $find("ctl00_cphBody_RadWindow1");
+            oWnd.Show();
+        }
+        function closeWindow() {
+            var oWnd = $find("ctl00_cphBody_RadWindow1");
+            oWnd.close();
+        }
+        function printTerms(divId) {
+            var divElement = document.getElementById(divId).innerHTML;
+            var printWindow = window.open("", "", "left=0, top=0, toolbar=0, status=0");
+            printWindow.document.write("<html><head><title></title></head><body>" + divElement + "</body>");
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+        }
+    </script>
+<link href="/WebResource.axd?d=3qbUWoqobwv6PpI7rPr6FMEwrWnAZTD4QQtHRUQHeh90ZVh6g4q0jzEVAL3xTBR4sj7Id9MNCrwsHGTHXT2Om3wzo9WnP5ZX9ZL2HYuUTiHZBtvzMOsUJvSFV1K9gHjAVQizSIDnqrrwVMihBcHBqA2&amp;t=635654099482644290" type="text/css" rel="stylesheet" class="Telerik_stylesheet" /><link href="/WebResource.axd?d=LKcxH0Shcx7vmNBIqz0o0UXG4Oph_M-TOPZiOWK9fD-bGisN2nE6Ak4OQP8jVcVscwTXfiv71gvE10vORH-cuQ_NGtZdvBNC4DMvE0nP9yk30nQ9g4bkh5hnc4SZmmjiV-49TmXTdLBe5BcBxDmggpmTG4cjJigeJPNkYzT-Zgg1&amp;t=635654099482644290" type="text/css" rel="stylesheet" class="Telerik_stylesheet" /><link href="/WebResource.axd?d=RRd5-4uDXudb9LtO6CPog9DNJ5JYTH-wlSUcxO7xCeQ958k_vIF4rIc9A77-94nr3ezd0MVCz-MQn5EOLgrh1J_Ag1PlimbTO01GQQJmOwu_nvn_Dr66DP3v8AK0EFRdFOkWwGmBz-C6Ir1NBY5RwQ2&amp;t=635654099482644290" type="text/css" rel="stylesheet" class="Telerik_stylesheet" /><link href="/WebResource.axd?d=cQnFc9s6mEU2T-ww7KSzZSC4_mlKqHiXTt6jHMqDNjrMpOl7jASqbisdM_DX6ajXqU6nVNvb7VvR0ehLtAqb2clcYm88f9YV7bt_fKX4aLB2szLSKznUsB_ayd5ImHrxMY1ZhESmodIytcdXJ_yNLAqeeM2itSnBHOWhIZoKrcs1&amp;t=635654099482644290" type="text/css" rel="stylesheet" class="Telerik_stylesheet" /><link href="/WebResource.axd?d=3LlB6rKZpCmYE_3Mxwrr3c4aggrmBOBM5LZRfBzNsI27BR4vM5BzCR3juUq_GggnZt1Hm8keg09MD7eiYamBTmKYWeBybAmfMXFAEx0gVkf3oRAW8VAeRo7J14C6aulahoj6z0rh6XB_Zy6XDNf8UA2&amp;t=635654099482644290" type="text/css" rel="stylesheet" class="Telerik_stylesheet" /><link href="/WebResource.axd?d=jlWbhrhMAkyGpV7UcOL-zuYEf4TKhELkJr70HOs6xfMqzOZ7ZAqTA5wQFydcqDl88p0I_JwW4ue3kMU7KFarKdbERtn7cA8hsyP-kPb0gqBNoGmqnLOMbLySLVeGAj9FuvJ3vwbXrjINRg-HKxnFFuFbIBMLEi73fTes669FOXM1&amp;t=635654099482644290" type="text/css" rel="stylesheet" class="Telerik_stylesheet" /></head>
+<body class="claro">
+    <form method="post" action="Default.aspx" id="form1">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwULLTE1NjM0MzE3OTQPZBYCZg9kFgQCAQ9kFgQCAw8WAh4EaHJlZgUWQ1NTL2V2YmNfMjAxNC5jc3M/djEuM2QCBA8WAh8ABRVDU1MvbWFwUG9wdXAuY3NzP3YxLjNkAgMPZBYCAgEPZBYCAgEPZBYGAgEPFCsAAw8WCB4VRW5hYmxlRW1iZWRkZWRTY3JpcHRzZx4XRW5hYmxlQWpheFNraW5SZW5kZXJpbmdoHhxFbmFibGVFbWJlZGRlZEJhc2VTdHlsZXNoZWV0Zx4SUmVzb2x2ZWRSZW5kZXJNb2RlCylyVGVsZXJpay5XZWIuVUkuUmVuZGVyTW9kZSwgVGVsZXJpay5XZWIuVUksIFZlcnNpb249MjAxNC4yLjcyNC40MCwgQ3VsdHVyZT1uZXV0cmFsLCBQdWJsaWNLZXlUb2tlbj0xMjFmYWU3ODE2NWJhM2Q0AmRkZGQCAw8UKwACDxYIHwFnHwNnHwQLKwQBHwJoZBAWA2YCAQICFgMUKwACZGQUKwACZGQUKwACZGQPFgNmZmYWAQV4VGVsZXJpay5XZWIuVUkuRHJvcERvd25MaXN0SXRlbSwgVGVsZXJpay5XZWIuVUksIFZlcnNpb249MjAxNC4yLjcyNC40MCwgQ3VsdHVyZT1uZXV0cmFsLCBQdWJsaWNLZXlUb2tlbj0xMjFmYWU3ODE2NWJhM2Q0ZAIFDxQrAAIPFgofAWcfAmgfA2ceDEVtcHR5TWVzc2FnZQVWU3RhcnQgdHlwaW5nIGluIGFkZHJlc3MgKHVuaXQjLWhvdXNlIyAgc3RyZWV0IG5hbWUgIHN0cmVldCB0eXBlICBkaXJlY3Rpb24gIGNpdHkvdG93bikfBAsrBAFkZGQYAQUeX19Db250cm9sc1JlcXVpcmVQb3N0QmFja0tleV9fFgMFGGN0bDAwJGNwaEJvZHkkUmFkV2luZG93MQUcY3RsMDAkY3BoQm9keSRyZGRsU2VhcmNoVHlwZQUXY3RsMDAkY3BoQm9keSRyc2JTZWFyY2icEtif2jvcdENc6hjLyt2dmdwCKMAujxgKrLnVknSnHg==" />
+
+
+<script src="/ScriptResource.axd?d=KtVUjXnEyYWRS6ZfJ7S6T_Ucfuaho2rzQnxNNKl4VfokWNybydUZu6e4zItt1hbgZF0JK4cwe1WpWARsw4qjsA4VJbRVAIPfXepy8Wdk_qBubjdq_lz7EtUoiU32d1SPaXfA4N4uWves5W14sqzfsLU5tKnwnFvVwY5v52aacCw1&amp;t=5854e822" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=Dh2v307kgDivwjDMkMs69EMXm9QLgYV-P9zEXBxKVaqRw7uJdg-viKGtO2Yuug8ywkgKPnvNrwqh8uobUNVXVK9Ggmqc4bVLa16Jjm_DpprwnU2ozHYNnJMJn82tK0icQQa4FGiNW0wGzWcWFmhEqA2&amp;t=ffffffffc4674767" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=sXJVPKvmP-QNNuqYuBTeFdYSrfATYBEHgfMgFOTR_hO9xRPXpTvAM17Q1nmrimvzpOGy2nV9bW2upw0_3-FnZqs7CZIwmdpGjdvHYRDhfKkIIIPj91SkRPFBIgSZOSw_Q1D5gjLSq6ARUQkqUO0Jig2&amp;t=ffffffffc4674767" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=YuQEvJwiGb4ORRZteSvQJPnDw2YQOPD2XJVclsmJ2K1Ej0KDH9E-4uAbwPON3vic91kq8_LUzP-neE-DRGuBBz-MUp5C7t5Fu0lDCzqopyUn398l-wLueZvUvEmOQUw2N8z1R8LvdUUdSvXAKFobCw2&amp;t=ffffffffc4674767" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=O_raP49JWJXJveiPNUC4cvJZtZTgdEHTO--3qI3N_OZ1pXeiUlxRAa2SkOoyFGywOxNnpsdx8aCynp7Ksb34xIscPgCXNqnK2y1GxiEUEhVCvsTaw1uIpenlVLZtfo9HLN79H4Du1U2hImIBg7uUDg2&amp;t=ffffffffc4674767" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=zwAJGf5Z6cnJkqkpxVO27jLsplOnG17i_mXUFvDOdQyZcmav1cTM3mb2gq5YXQbaFttmsBXObbqqOPfd_mZs27jj0IHQC7L2JcrAcudysx3Nh9xQ5VCnramY7DzePBYBa_VsjXQfJbzoaS5ntGHPS0jFrsZdDBj-xVWvw2FodY81&amp;t=ffffffffc4674767" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=AkK0HuwRNqkjDlMTOwH1tIXeTu7F_ejvuNgaXqs3QMvG6ddFHl5UvnYhZmV09PO4WYiwn3mbO5NcrAewuVjnRUP-OX50p4J79QQPnhy3o3w8EH3edD19JOBqyMNcg7CAAVnyRP24u4YGhtS1hFyODck2Vjx0m7yqv1c5RSGlSns1&amp;t=ffffffffc4674767" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=QecPAaU8_25vJnnkELsVdsfoGWO7fozoqFywATeEoVu4F91rt-nLYPNFVG8RMWpLxx3Xl7eAHA-qLfo43JynS597R9zkajXaHOGNT-4TtiFB0aO5c_F1ncbr7ftRZfggk1uc06avSEpnwhrIT9Si8uSOTxIrXc9_wihL7Z0SS_Q1&amp;t=ffffffffc4674767" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=b10uBzwgEd-d5nlY33cElO-8oV2jMWOSDAK5FYk1SRkDtAxRhVit4_qujuHmObkHlhGmDGu6z4e1KOLVAQDlcHgXyD5qfgzeQZtGqlAR2ZGTw7zuNDZ6s4DCYzxKBbxBVWmFnwRq3oaACH01ubEwa41xf09XIV1SO305FnB4mGQ1&amp;t=ffffffffc4674767" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=7SwX36UsysxCbqkmG9CntOM68AsHs1rw4FV77w0oQOOfzzFbLHL_vzmua4w2-l_obG_rzo3VKghRxgzI3FKp9bUKYrldF3N-Hw8GqtS3KisnMkt_oQg0bYv_D5xU1Ri1gBi3fg3X5ipQJ8tQJBsJ_9XRUru7S9i_32OoifWDP5DG1Q0lOqV77w2JYHMyptp60&amp;t=ffffffffc4674767" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=YP6Vqpgxcf22DsPO3Ocwl6g8z2RPb46j3kFy_-NgzAUcEHC5_ukmD2U0RfmKAplgXhaHigim1HtrP9uLD6vCr7_-9pBFSmNSqWQhqMyKyMooRZYNsFcKCmE9S2zb8CCsTcJbLncZJJ957UfaCMwHolhCsE3ELPAL4xRcivrBdEo1&amp;t=ffffffffc4674767" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=N0blbIsDwSokxTu5KFbvhoJJUB-UAfk63zSgkWKJ0993xVDWPTPZFpyI0-KG8sM1QtgrFenM2BpFytnunyErAWH8HqzQq4vU6oc2TaRtnX5Nk2h4hX11cDmtrYlgcjLVgoiplyuA_z4a2QpTNpciZHMQXfcjQ2Fv3qnqVPVdBDk1&amp;t=ffffffffc4674767" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=qjpGeVdaAu4TX8B1yKOeQTuJ0JGyCrvnC4iAX4qmZX1J_3XWjV1YQrPlVzweSkCjHYA1_Dod1oic9AUvsnqiFlE3cDIxVTFuqodCAoEd5e1kEGVtxoVTXpw69aFSUQNYwd76lbDXn9UPPZNcMdtmDpEA_ichmxKKe3cHaYjTRHs1&amp;t=ffffffffc4674767" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=XWJuP1404p-q-AGr93ERTEN9YCqVhLiWHLnAtkqFpCbb_kErq3tA9guOAK9As2Ik8xypx2AJLt-_ped7JOKHtGtWC4Aq5m5cmPU8UHIHIOoccGK-QaEnRSICCQQUEp2ICEldsSUCrSTqYADbSZEn6dtcJSNG1gS4wlne2OapZ5o1&amp;t=ffffffffc4674767" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=XeG_N4RlJu6KjSUW6E5Svrtdm_dZ0wkV_NX_zDFTbDBRl441S1eqhNVFEmyl6-SPq7iCJgk5MTIDL4eMFnyWUeCFoY4fuys9EOE6zu2bjHvwpCN2u3ZXObGrqyD3HQSCZVGbsnVNj1DbOgOtZI1ZA5R7IY6fm727BDP0BNFHzlw1&amp;t=ffffffffc4674767" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=8iRQpVuMsAWi_ztmd1ShZTRw3Ppf_-l_Ws9gUWn9GVicgnUqX-d2V5f_jUmpZeNB9vsuk1YnY0CTMRAJ4aGf0NM5faxBBXHPGzLzHFZQ83u17ubK363aTJvyH2vSBGZPOnmif7yvTD1z9z99jsriV2pyG6CRLkJyfUhvTxlLkbI1&amp;t=ffffffffc4674767" type="text/javascript"></script>
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="CA0B0334" />
+<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEWAgLrvrngBgLlrrqLA14qW9hIZ3O0DT2P93FifzGLPzmmn+IRLbsLr/vfSoTm" />
+        
+        <div id="container">
+            <div id="header-background">
+                <div id="header">
+                    <a href="../Default.aspx"><img src="../Images/evbcLogo.png" style="border: none;" alt="eValueBC" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="http://www.bcassessment.ca"><img src="../Images/BCA.png" alt="BCA" style="border: none;" /></a>
+                    <div id="menu">
+                        <span class="menuItem"><a href="../FAQs.aspx">FAQs</a></span>
+                        <span class="menuItem"><a href="../SSL/ContactUs.aspx">Contact Us</a></span>
+                    </div>
+                </div>
+            </div>
+            <div id="body">
+                
+    <div id="landing-background">
+        <div id="landing">
+            <div id="welcome">
+                Begin searching for property information in BC
+            </div>
+            <div id="explanation">
+                <div id="explanationView">View details on a single property.</div>
+                <div id="explanationCompareNeighbour">Compare neighbouring properties.</div>
+                <div id="explanationCompareSales">Compare sales information.</div>
+            </div>
+            <div class="RadAjaxPanel" id="ctl00_cphBody_ctl00_cphBody_ctl00Panel">
+	<div id="ctl00_cphBody_ctl00">
+		<!-- 2014.2.724.40 -->
+                <div id="ctl00_cphBody_RadWindow1" class="noborder-modal" style="display:none;">
+			<div id="ctl00_cphBody_RadWindow1_C" style="display:none;">
+				
+                        <div class="modal-background">
+                            <div class="icons">
+                                <div class="close-wrapper">
+                                    <a href="javascript:closeWindow()" class="modal-close-area"></a>
+                                </div>
+                                <div class="print-wrapper">
+                                    <a href="javascript:printTerms('terms-content')" class="modal-print-area"></a>
+                                </div>
+                            </div>
+                            <div class="modal-heading-text">
+                                <br />
+                                <h1>e-value<em>BC</em> TERMS OF USE</h1>
+                            </div>
+                            <div id="terms-content" class="modal-content">
+                                <p>
+                                    <strong>e-value<em>BC – Compare Assessments Online: Terms of Use Agreement</em></strong>
+                                </p>
+                                <p>
+                                    By accessing any of the websites operated by BC Assessment, the user agrees to be bound by all of the Terms of Use and agrees that these terms
+                                    constitute a
+                                binding contract between the user and BC Assessment.
+                                </p>
+                                <p>
+                                    The information in this database is the intellectual property of BC Assessment(or an identified third party, where applicable) and is protected
+                                    by copyright laws. These data are intended for private, non-commercial use by individuals.
+                                </p>
+                                <p>
+                                    Any commercial use of these data in whole or in part, directly or indirectly, is specifically forbidden except with the prior written authority
+                                    of the
+                                owner of the copyright.
+                                </p>
+                                <p>
+                                    Users may, subject to these Terms and Conditions, print or otherwise save individual pages for private use. However, data may not be modified
+                                    or altered in
+                                any respect, merged with other data or published in any form, in whole or in part.
+                                </p>
+                                <p>
+                                    Prohibited uses of BC Assessment information include:
+                                <ol>
+                                    <li>"screen scraping", "database scraping" and any other activity intended to collect, store, reorganize or manipulate or publish data on the pages
+                                        produced
+                                by, or displayed on the BC Assessment website;</li>
+                                    <li>obtaining names, addresses or telephone numbers for solicitation purposes, whether the solicitations are made by telephone, mail or any other
+                                        means;</li>
+                                    <li>harassing an individual;</li>
+                                    <li>using it for other use, activity or any other prohibited purpose.</li>
+                                </ol>
+                                </p>
+                                <p>
+                                    <strong>Liability and Warranty Disclaimer</strong>
+                                </p>
+                                <p>
+                                    The data in this website is obtained from various sources and is determined as of specific dates set out in the Assessment Act. As a result,
+                                    BC Assessment
+                                does not warrant or guarantee that it is current or accurate. The data is provided for your convenience only. Use of this information without verification
+                                    from original sources is at your own risk.
+                                </p>
+                                <p>
+                                    This website uses content and services (“Maps API”) provided by Google and/or its subsidiaries and affiliates (collectively, “Google”). The
+                                    use of Maps
+                                    API is subject to the Google Terms of Use; by using this BC Assessment website, users agree to be bound by Google’s Terms of Use, found
+                                here: <a href="https://maps.google.com/help/terms_maps.html">https://maps.google.com/help/terms_maps.html</a>.
+                                </p>
+                                <p>
+                                    BC Assessment makes no representations about the suitability of the data or graphics published on this site. Everything on this site is provided
+                                    "As Is"
+                                without warranty of any kind including all implied warranties and conditions of merchantability, fitness for a particular purpose, title and
+                                non-infringement. BC Assessment shall not be liable for any direct, incidental, consequential, indirect or punitive damages arising out of access
+                                    to or use
+                                of this site.
+                                </p>
+                            </div>
+                            <div class="modal-button">
+                                <a href="javascript:closeWindow()" class="terms-close-button">OK</a>
+                            </div>
+                        </div>
+                    
+			</div><input id="ctl00_cphBody_RadWindow1_ClientState" name="ctl00_cphBody_RadWindow1_ClientState" type="hidden" />
+		</div>
+                <div id="searchboxLanding">
+                    <div id="searchTitle">Search</div>
+                    <div id="searchRow">
+                        <span class="searchType">
+                            <div id="ctl00_cphBody_rddlSearchType" class="RadDropDownList RadDropDownList_Default landingPageSearchType">
+			<span class="rddlInner"><span class="rddlFakeInput">Address</span><span class="rddlIcon"><!-- &nbsp; --></span></span><div class="rddlSlide" id="ctl00_cphBody_rddlSearchType_DropDown" style="display:none;">
+				<div class="rddlPopup rddlPopup_Default">
+					<ul class="rddlList">
+						<li class="rddlItem  rddlItemSelected">Address</li><li class="rddlItem">Roll Number</li><li class="rddlItem">Plan</li>
+					</ul>
+				</div>
+			</div><input id="ctl00_cphBody_rddlSearchType_ClientState" name="ctl00_cphBody_rddlSearchType_ClientState" type="hidden" />
+		</div>
+                        </span>
+                        <span class="searchbox">
+                            <div id="ctl00_cphBody_rsbSearch" class="RadSearchBox RadSearchBox_Default landingPageSearchBox"><font face="Montserrat,sans-serif">
+			<span class="rsbInner"><input class="rsbInput radPreventDecorate rsbEmptyMessage" type="text" value="Start typing in address (unit#-house#  street name  street type  direction  city/town)" name="ctl00_cphBody_rsbSearch" id="ctl00_cphBody_rsbSearch_Input" /></span><div class="rsbSlide" style="display:none;">
+				<div class="rsbPopup rsbPopup_Default landingPageDropDown">
+
+				</div>
+			</div><input id="ctl00_cphBody_rsbSearch_ClientState" name="ctl00_cphBody_rsbSearch_ClientState" type="hidden" />
+		</font></div>
+                        </span>
+                    </div>
+                    <div id="termsOfUse">
+                        Use of <span style="font-style: italic; letter-spacing: 2px">e</span>-value<i>BC</i> implies agreement with our
+                 <span style="font-weight: 700; text-decoration: underline; letter-spacing: .02em;"><a href="#" onclick="javascript:showWindow();">Terms of Use</a></span>.
+                    </div>
+                    <div style="font-size: 10px; line-height: 10px;">
+                        Any commercial use of these data in whole or in part, directly or indirectly, 
+                including the use of such data for business, residential address or telephone directory services or any solicitation service is specifically prohibited
+                        except with the prior written authority of the owner of the copyright.
+                    </div>
+                </div>
+            
+	</div>
+</div>
+        </div>
+    </div>
+    <div id="messages-background">
+        <div id="messages">
+            <div id="messageLinkRight">
+                
+            </div>
+        </div>
+    </div>
+    <label id="websitelabel">If you are a human, leave this blank</label>
+    <input name="ctl00$cphBody$website" type="text" id="cphBody_website" class="website" />
+
+            </div>
+            <div id="footer-background">
+                <div id="footer">
+                    <span class="footerLink"><a href="http://www.bcassessment.ca/Pages/Copyright.aspx" target="_blank">Copyright</a></span>
+                    <span class="footerLink"><a href="http://www.bcassessment.ca/Pages/Disclaimer.aspx" target="_blank">Disclaimer</a></span>
+                    <span class="footerLink"><a href="http://www.bcassessment.ca/Pages/Privacy.aspx" target="_blank">Privacy</a></span>
+                    <span class="footerLink"><a href="../SSL/ContactUs.aspx">Contact Us</a></span>
+                    <span class="footerLink"><a href="http://www.bcassessment.ca">Return to BC Assessment</a></span>
+                    <div id="footerCopy">
+                        &copy; BC Assessment 2015
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+
+<script type="text/javascript">
+//<![CDATA[
+Sys.Application.add_init(function() {
+    $create(Telerik.Web.UI.RadWindow, {"_dockMode":true,"_renderMode":2,"behaviors":4,"clientStateFieldID":"ctl00_cphBody_RadWindow1_ClientState","formID":"form1","height":"385px","iconUrl":"","minimizeIconUrl":"","modal":true,"name":"RadWindow1","skin":"Default","width":"820px"}, null, null, $get("ctl00_cphBody_RadWindow1"));
+});
+Sys.Application.add_init(function() {
+    $create(Telerik.Web.UI.RadDropDownList, {"_postBackReference":"__doPostBack(\u0027ctl00$cphBody$rddlSearchType\u0027,\u0027arguments\u0027)","_selectedIndex":0,"_selectedText":"Address","_selectedValue":"Address","_uniqueId":"ctl00$cphBody$rddlSearchType","autoPostBack":true,"clientStateFieldID":"ctl00_cphBody_rddlSearchType_ClientState","itemData":[{"value":"Address","selected":true},{"value":"Roll"},{"value":"Plan"}]}, null, null, $get("ctl00_cphBody_rddlSearchType"));
+});
+Sys.Application.add_init(function() {
+    $create(Telerik.Web.UI.RadSearchBox, {"_emptyMessage":"Start typing in address (unit#-house#  street name  street type  direction  city/town)","_highlightFirstMatch":true,"_postBackOnSearch":true,"_postBackReference":"__doPostBack(\u0027ctl00$cphBody$rsbSearch\u0027,\u0027arguments\u0027)","_showAllResultsText":"Show All Results","_showSearchButton":false,"_skinName":"Default","_uniqueId":"ctl00$cphBody$rsbSearch","clientStateFieldID":"ctl00_cphBody_rsbSearch_ClientState","maxResultCount":10,"webServiceSettings":"{\"path\":\"Default.aspx\",\"method\":\"GetItems\"}"}, null, null, $get("ctl00_cphBody_rsbSearch"));
+});
+Sys.Application.add_init(function() {
+    $create(Telerik.Web.UI.RadAjaxPanel, {"clientEvents":{OnRequestStart:"",OnResponseEnd:""},"enableAJAX":true,"enableHistory":false,"links":[],"loadingPanelID":"","styles":[],"uniqueID":"ctl00$cphBody$ctl00"}, null, null, $get("ctl00_cphBody_ctl00"));
+});
+//]]>
+</script>
+</form>
+</body>
+</html>
