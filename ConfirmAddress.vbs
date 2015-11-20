@@ -25,7 +25,7 @@ dim sSearchForAddressStart ' as string
 dim sCanPostAddress 'as string
 dim sCurlGetVersion 'as string
 dim sCurlVersion 'as string
-test
+
 sDBLQuoteCode = chr(34)
 sFailIndicator = "CAN|1|433|17"
 sSearchForAddressStart = "Text"
