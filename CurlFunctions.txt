@@ -37,7 +37,6 @@ function CurlVersionHandlesHTTPS()
 			.echo "The version of Curl you are using cannot handle HTTPS."
 			.echo "You can download the correct version at http://www.confusedbycode.com/curl/"
 			.echo "I recommend choosing the zip option and copying the curl executable to this directory"
-			.echo "If you are running a 64 bit system and still run into errors.  Try the 32 Bit version."
 		end with
 		CurlVersionHandlesHTTPS = false
 	else

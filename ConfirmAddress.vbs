@@ -25,16 +25,16 @@ if CurlVersionHandlesHTTPS = True then
 	'URL Encode the passed in address
 	sURL = BuildCanadaPostURL(sAddress)
 	sReturned = GetResultFromURL(sURL)
-	wscript.echo sReturned
+	'wscript.echo sReturned
 	ProcessResult(sReturned)
 end if
+
 
 
 wscript.quit
 
 function ProcessResult(byval sResult)
 	
-	dim sCanPostAddress 'as string	
 	dim iContainerCount ' as integer
 	dim sID ' as string
 	dim sCanPostText ' as string
@@ -50,7 +50,7 @@ function ProcessResult(byval sResult)
 			.echo "Canada Post Text             :  " & sCanPostText
 			if iContainerCount = 1 and isnumeric(right(sID, 7)) then
 				.echo "Canada Post Address          :  " & sCanPostText
-				if sAddress = sCanPostAddress then
+				if sAddress = sCanPostText then
 					.echo "Result                       :  Valid Address.  A perfect match was found"
 				else
 					.echo "Result                       :  Valid Address.  A single possible address was found.  Not a perfect match to search term."
@@ -72,7 +72,9 @@ function RetrieveCanadaPostParameter(byval sResultSet, byval sParameterName)
 	if sParameterName = "ContainerCount" then
 		sReturnValue = mid(sResultSet, 19, 1)
 	elseif sParameterName = "Id" then
-		sReturnValue = mid(sResultSet, 37, 13)
+		iStart = instr(1, sResultSet, "Id") + 5
+		iFinish = instr(iStart, sResultSet, sDBLQuoteCode)
+		sReturnValue = mid(sResultSet, iStart, iFinish - iStart)
 	elseif sParameterName = "Text" then
 		iStart = instr(1, sResultSet, "Text") + 7
 		iFinish = instr(iStart, sResultSet, sDBLQuoteCode)
