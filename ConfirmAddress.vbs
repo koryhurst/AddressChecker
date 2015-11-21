@@ -20,6 +20,9 @@ dim bVerbose ' as boolean
 'on error resume next 
 call Include("CurlFunctions")
 
+'This whole section should be functionalized
+'at least the check to have the right parameters
+'Then back here at main I can assign them if bClearedToProceed is true
 with colNamedArguments
 	'wscript.echo .Exists("InputFile")
 	'wscript.echo .Exists("InputAddress")
@@ -57,7 +60,19 @@ if bVerbose = "" then
 	bVerbose = False
 end if
 
+'this check should also be separated out to clear to bClearedToProceed
 if CurlVersionHandlesHTTPS = True then 
+
+'once cleared to proceed produce notes about the result codes
+'if verbose
+				REM if sAddress = sCanPostText then
+					REM .echo "Result                       :  Valid Address.  A perfect match was found"
+				REM else
+					REM .echo "Result                       :  Valid Address.  A single possible address was found.  Not a perfect match to search term."
+				REM end if
+			REM else
+				REM .echo "Result                       :  No distinct address found.  Address too poorly formed or not a valid address.  If multiple dwelling please include suite number."
+			REM end if
 
 	if sInputType = "SingleAddress" then
 		'URL Encode the passed in address
@@ -91,6 +106,7 @@ sub ProcessSingleAddress(byval sSearchTerm, byval sResult)
 	iContainerCount = RetrieveCanadaPostParameter(sResult, "ContainerCount")
 	sID = RetrieveCanadaPostParameter(sResult, "Id")
 	sCanPostText = RetrieveCanadaPostParameter(sResult, "Text")
+	'this output now has to be columnized
 	'if iContainerCount = 1 and isnumeric(right(sID, 7)) then
 		with wscript
 			.echo "Searched for Address         :  " & sSearchTerm
