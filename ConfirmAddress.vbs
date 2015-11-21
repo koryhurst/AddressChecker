@@ -16,6 +16,10 @@ dim sInputFile ' as string
 dim sInputAddress ' as string
 dim sInputType ' as string
 dim bVerbose ' as boolean
+dim sVerbose ' as string
+dim bClearedToProceed ' as boolean
+dim bCurlVersionOK ' as boolean
+dim bParametersOK ' as boolean
 
 'on error resume next 
 call Include("CurlFunctions")
@@ -23,57 +27,36 @@ call Include("CurlFunctions")
 'This whole section should be functionalized
 'at least the check to have the right parameters
 'Then back here at main I can assign them if bClearedToProceed is true
-with colNamedArguments
-	'wscript.echo .Exists("InputFile")
-	'wscript.echo .Exists("InputAddress")
-	if .Exists("InputFile") = 0 and .Exists("InputAddress") = 0 then 
-		With wscript
-			.echo "One of the parameters InputFile or InputAddress is required"
-			.echo "Usage: "
-			.echo "cscript ConfirmAddress.vbs /InputFile:FileName.txt or /InputAddress=""Single Address To Check"" /Verbose:True|False"
-			.echo "Verbose is optional.  Default is False"
-			.quit
-		end with
-	elseif .Exists("InputFile") = -1 and .Exists("InputAddress") = -1 then 
-		With wscript
-			.echo "Either the parameter InputFile or the parameter InputAddress is required"
-			.echo "Usage: "
-			.echo "cscript ConfirmAddress.vbs /InputFile:FileName.txt or /InputAddress=""Single Address To Check"" /Verbose:True|False"
-			.echo "Verbose is optional.  Default is False"
-			.quit
-		end with		
-	elseif .Exists("InputFile") = -1 and .Exists("InputAddress") = 0 then 
-		wscript.echo "File detected"
-		sInputFile = .Item("InputFile")
-		wscript.echo sInputFile
-		sInputType = "File"
-	elseif .Exists("InputFile") = 0 and .Exists("InputAddress") = -1 then 
-		'wscript.echo "Single Address detected"
-		sInputAddress = .Item("InputAddress")
-		'wscript.echo sInputAddress
-		sInputType = "SingleAddress"
+bClearedToProceed = False
+'this one could be a sub, as it just bails if it encounters trouble
+bParametersOK = CheckParameters(colNamedArguments)
+bCurlVersionOK = CurlVersionHandlesHTTPS
+bClearedToProceed = bParametersOK and bCurlVersionOK
+
+if bClearedToProceed = True then 
+	with colNamedArguments
+		'wscript.echo .Exists("InputFile")
+		'wscript.echo .Exists("InputAddress")
+		if .Exists("InputFile") = -1 and .Exists("InputAddress") = 0 then 
+			sInputFile = .Item("InputFile")
+			sInputType = "File"
+		elseif .Exists("InputFile") = 0 and .Exists("InputAddress") = -1 then 
+			sInputAddress = .Item("InputAddress")
+			sInputType = "SingleAddress"
+		end if
+		sVerbose = .Item("Verbose")
+	end with ' the colNamedArguments one
+	
+	if sVerbose = "True" then
+		bVerbose = 1
+	else 
+		bVerbose = 0
 	end if
-	bVerbose = .Item("Verbose")
-end with ' the colNamedArguments one
-
-if bVerbose = "" then 
-	bVerbose = False
-end if
-
-'this check should also be separated out to clear to bClearedToProceed
-if CurlVersionHandlesHTTPS = True then 
-
-'once cleared to proceed produce notes about the result codes
-'if verbose
-				REM if sAddress = sCanPostText then
-					REM .echo "Result                       :  Valid Address.  A perfect match was found"
-				REM else
-					REM .echo "Result                       :  Valid Address.  A single possible address was found.  Not a perfect match to search term."
-				REM end if
-			REM else
-				REM .echo "Result                       :  No distinct address found.  Address too poorly formed or not a valid address.  If multiple dwelling please include suite number."
-			REM end if
-
+	
+	if bVerbose = 1 then 
+		call OutputNotes
+	end if
+	
 	if sInputType = "SingleAddress" then
 		'URL Encode the passed in address
 		sURL = BuildCanadaPostURL(sInputAddress)
@@ -93,10 +76,59 @@ if CurlVersionHandlesHTTPS = True then
 		Loop
 		oFile.Close	
 	end if
+	
 end if
 
 wscript.quit
 
+function CheckParameters(byval colNamedArguments)
+
+	with colNamedArguments
+		'wscript.echo .Exists("InputFile")
+		'wscript.echo .Exists("InputAddress")
+		if .Exists("InputFile") = 0 and .Exists("InputAddress") = 0 then 
+			With wscript
+				.echo "Error One of the parameters InputFile or InputAddress is required"
+				call OutputUsage
+				.quit
+			end with
+		elseif .Exists("InputFile") = -1 and .Exists("InputAddress") = -1 then 
+			With wscript
+				.echo "Either the parameter InputFile or the parameter InputAddress is required"
+				call OutputUsage
+				.quit
+			end with	
+		end if
+	end with
+	CheckParameters = True
+	
+end function
+
+Sub OutputUsage
+		
+		with wscript
+			.echo "Usage: "
+			.echo "  cscript ConfirmAddress.vbs params"
+			.echo "  params:"
+			.echo "  /InputFile:FileName.txt or /InputAddress=""Single Address To Check"" ONE REQUIRED"
+			.echo "  /Verbose:True|False  optional.  Default is False"
+		end with
+		call OutputNotes
+		
+end sub
+Sub OutputNotes
+	
+	with wscript
+		.echo "Notes: "
+		.echo "Result Code 2:  Valid Address.  A perfect match was found"
+		.echo "Result Code 1:  Valid Address.  A single possible address was found.  Not a perfect match to search term."
+		.echo "Result Code 0:  No distinct address found.  Address too poorly formed or not a valid address.  "
+		.echo " "
+		.echo "**Multiple dwelling addresses without the suite number return code 0"
+		.echo " "
+	end with 
+	
+end Sub
 sub ProcessSingleAddress(byval sSearchTerm, byval sResult)
 	
 	dim iContainerCount ' as integer
@@ -108,23 +140,24 @@ sub ProcessSingleAddress(byval sSearchTerm, byval sResult)
 	sCanPostText = RetrieveCanadaPostParameter(sResult, "Text")
 	'this output now has to be columnized
 	'if iContainerCount = 1 and isnumeric(right(sID, 7)) then
-		with wscript
-			.echo "Searched for Address         :  " & sSearchTerm
-			.echo "Canada Post Container Count  :  " & iContainerCount
-			.echo "Canada Post ID               :  " & sID
-			.echo "Canada Post Text             :  " & sCanPostText
+	with wscript
+		.echo "Searched for Address         :  " & sSearchTerm
+		.echo "Canada Post Container Count  :  " & iContainerCount
+		.echo "Canada Post ID               :  " & sID
+		.echo "Canada Post Text             :  " & sCanPostText
 '			if iContainerCount = 1 and isnumeric(right(sID, 7) then
-			if iContainerCount = 1 and mid(sID, 5, 1) = "B" then
-				.echo "Canada Post Address          :  " & sCanPostText
-				if sAddress = sCanPostText then
-					.echo "Result                       :  Valid Address.  A perfect match was found"
-				else
-					.echo "Result                       :  Valid Address.  A single possible address was found.  Not a perfect match to search term."
-				end if
+		if iContainerCount = 1 and mid(sID, 5, 1) = "B" then
+			.echo "Canada Post Address          :  " & sCanPostText
+			if sAddress = sCanPostText then
+				.echo "Result Code                  :  2"
 			else
-				.echo "Result                       :  No distinct address found.  Address too poorly formed or not a valid address.  If multiple dwelling please include suite number."
+				.echo "Result Code                  :  1"
 			end if
-		end with 
+		else
+				.echo "Result Code                  :  0"
+		end if
+		.echo " " 'spacer
+	end with 
 
 end sub
 
