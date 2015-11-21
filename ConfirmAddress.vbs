@@ -34,37 +34,53 @@ wscript.quit
 
 function ProcessResult(byval sResult)
 	
-	'sFailIndicator = "CAN|1|433|17"
-	dim sFailIndicator: sFailIndicator = "CAN|1"'as string
-	dim sDBLQuoteCode: sDBLQuoteCode = chr(34) 'as string
-	dim sSearchForAddressStart: sSearchForAddressStart = "Text" ' as string
-	dim bAddressExists 'as boolean
-	dim iStart 'as integer
-	dim iFinish 'as integer
-	dim sCanPostAddress 'as string
+	dim sCanPostAddress 'as string	
+	dim iContainerCount ' as integer
+	dim sID ' as string
+	dim sCanPostText ' as string
 	
-	if instr(1, sResult, sFailIndicator) > 0 then
-		bAddressExists = False
-		wscript.echo "No Address Found"
-	else 
-		bAddressExists = True
-		'extract the returned address
-		iStart = instr(1, sResult, "Text") + 7
-		iFinish = instr(iStart, sResult, sDBLQuoteCode)
-		sCanPostAddress = mid(sResult, iStart, iFinish - iStart)
+	iContainerCount = RetrieveCanadaPostParameter(sResult, "ContainerCount")
+	sID = RetrieveCanadaPostParameter(sResult, "Id")
+	sCanPostText = RetrieveCanadaPostParameter(sResult, "Text")
+	'if iContainerCount = 1 and isnumeric(right(sID, 7)) then
 		with wscript
-			.echo "Searched for Address        :  " & sAddress
-			.echo "Canada Post Address Found   :  " & sCanPostAddress
-			if mid(sResult, 19, 1) = 1 then
-				.echo "Result                      :  A single possible address was found"
+			.echo "Searched for Address         :  " & sAddress
+			.echo "Canada Post Container Count  :  " & iContainerCount
+			.echo "Canada Post ID               :  " & sID
+			.echo "Canada Post Text             :  " & sCanPostText
+			if iContainerCount = 1 and isnumeric(right(sID, 7)) then
+				.echo "Canada Post Address          :  " & sCanPostText
+				if sAddress = sCanPostAddress then
+					.echo "Result                       :  Valid Address.  A perfect match was found"
+				else
+					.echo "Result                       :  Valid Address.  A single possible address was found.  Not a perfect match to search term."
+				end if
 			else
-				.echo "Result                      :  " & mid(sResult, 19, 1) & " Possible results found address listed is best guess"
-			end if 
+				.echo "Result                       :  No distinct address found.  Sought after address either too poorly formed or not a valid address"
+			end if
 		end with 
-	end if
 
 end function
+function RetrieveCanadaPostParameter(byval sResultSet, byval sParameterName)
 
+	dim sDBLQuoteCode: sDBLQuoteCode = chr(34) 'as string
+	dim sReturnValue ' as string
+	dim iStart 'as integer
+	dim iFinish 'as integer
+	'{"ContainerCount":1,"Items":[{"Id":"CAN|8|833|1897","Text":"Sussex Dr, Ottawa, ON","Highlight":"","Cursor":0,"Description":"55 Results","Next":"Find"}]}
+	'{"ContainerCount":1,"Items":[{"Id":"CAN|B|3730784","Text":"2961 29th Ave E, Vancouver, BC","Highlight":"","Cursor":0,"Description":"","Next":"Retrieve"}]}
+	if sParameterName = "ContainerCount" then
+		sReturnValue = mid(sResultSet, 19, 1)
+	elseif sParameterName = "Id" then
+		sReturnValue = mid(sResultSet, 37, 13)
+	elseif sParameterName = "Text" then
+		iStart = instr(1, sResultSet, "Text") + 7
+		iFinish = instr(iStart, sResultSet, sDBLQuoteCode)
+		sReturnValue = mid(sResultSet, iStart, iFinish - iStart)
+	end if
+	RetrieveCanadaPostParameter = sReturnValue
+	
+end function
 function BuildCanadaPostURL(byval sAddress)
 
 	dim sDBLQuoteCode: sDBLQuoteCode = chr(34)'as string
