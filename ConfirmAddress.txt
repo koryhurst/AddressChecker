@@ -48,7 +48,7 @@ function ProcessResult(byval sResult)
 			.echo "Canada Post Container Count  :  " & iContainerCount
 			.echo "Canada Post ID               :  " & sID
 			.echo "Canada Post Text             :  " & sCanPostText
-			if iContainerCount = 1 and isnumeric(right(sID, 7)) then
+			if iContainerCount = 1 and mid(sID, 5, 1) = "B" then
 				.echo "Canada Post Address          :  " & sCanPostText
 				if sAddress = sCanPostText then
 					.echo "Result                       :  Valid Address.  A perfect match was found"
