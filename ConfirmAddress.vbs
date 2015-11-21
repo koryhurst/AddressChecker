@@ -31,20 +31,15 @@ end if
 wscript.quit
 
 function ProcessResult(sResult)
-
-	dim sFailIndicator 'as string
+	
+	'sFailIndicator = "CAN|1|433|17"
+	dim sFailIndicator: sFailIndicator = "CAN|1"'as string
+	dim sDBLQuoteCode: sDBLQuoteCode = chr(34) 'as string
+	dim sSearchForAddressStart: sSearchForAddressStart = "Text" ' as string
 	dim bAddressExists 'as boolean
 	dim iStart 'as integer
 	dim iFinish 'as integer
-	dim sSearchForAddressStart ' as string
 	dim sCanPostAddress 'as string
-	dim sDBLQuoteCode 'as string
-	
-	sDBLQuoteCode = chr(34)
-	'sFailIndicator = "CAN|1|433|17"
-	sFailIndicator = "CAN|1"
-	sSearchForAddressStart = "Text"
-
 	
 	if instr(1, sResult, sFailIndicator) > 0 then
 		bAddressExists = False
@@ -70,16 +65,15 @@ end function
 
 function BuildCanadaPostURL(sAddress)
 
-	dim sDBLQuoteCode 'as string
+	dim sDBLQuoteCode: sDBLQuoteCode = chr(34)'as string
 	dim sURLEncAddress 'as string
 	dim sURLPrefix ' as string
 	dim sURLSuffix ' as string
 	dim sBuiltUrl 'as string
 	
-	sDBLQuoteCode = chr(34)
+	'sDBLQuoteCode = chr(34)
 	
 	sURLEncAddress = replace(sAddress, " ", sDBLQuoteCode & "%" & sDBLQuoteCode & "20")
-
 	sURLPrefix = "curl " & sDBLQuoteCode & "https://ws1.postescanada-canadapost.ca/AddressComplete/Interactive/Find/v2.10/json3ex.ws?Key=ea98-jc42-tf94-jk98&Country=CAN&SearchTerm="
 	sURLSuffix = "&LanguagePreference=en&LastId=&SearchFor=Everything&OrderBy=UserLocation&$block=true&$cache=true&MaxSuggestions=7&MaxResults=100" & sDBLQuoteCode & " -H " & sDBLQuoteCode & "Origin: https://www.canadapost.ca" & sDBLQuoteCode & " -H " & sDBLQuoteCode & "Accept-Encoding: gzip, deflate, sdch" & sDBLQuoteCode & " -H " & sDBLQuoteCode & "Accept-Language: en-US,en;q=0.8" & sDBLQuoteCode & " -H " & sDBLQuoteCode & "User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36" & sDBLQuoteCode & " -H " & sDBLQuoteCode & "Accept: */*" & sDBLQuoteCode & " -H " & sDBLQuoteCode & "Referer: https://www.canadapost.ca/cpo/mc/personal/postalcode/fpc.jsf" & sDBLQuoteCode & " -H " & sDBLQuoteCode & "Connection: keep-alive" & sDBLQuoteCode & " --compressed"
 	sBuiltUrl = sURLPrefix & sURLEncAddress & sURLSuffix
@@ -90,22 +84,18 @@ end function
 
 function GetResultFromURL(sURL)
 
-	dim objShell ' as object - the command shell
-	dim objExec ' as object - the command to send
+	dim objShell: Set objShell = WScript.CreateObject("WScript.Shell") ' as object - the command shell
+	dim objExec: Set objExec = objShell.Exec(sURL) ' as object - the command to send
 	dim sLine 'as string
-	dim sResult 'as string
-
-	Set objShell = WScript.CreateObject("WScript.Shell")
-	Set objExec = objShell.Exec(sURL)
+	dim sReturned 'as string
 
 	Do
-		'bad practice - reusing variable
 		sLine = objExec.StdOut.ReadLine()
-		sResult = sResult & sLine & vbcrlf
+		sReturned = sReturned & sLine & vbcrlf
 	Loop While Not objExec.Stdout.atEndOfStream
 
 	'wscript.echo sResult
-	GetResultFromURL = sResult
+	GetResultFromURL = sReturned
 	set objExec = nothing
 	set objShell = nothing
 
@@ -115,16 +105,12 @@ end function
 
 function CurlVersionHandlesHTTPS()
 
-	dim objShell ' as object - the command shell
-	dim objExec ' as object - the command to send
-	dim sCurlGetVersion 'as string
+	dim sCurlGetVersion: sCurlGetVersion = "curl -V"   'as string
+	dim objShell: Set objShell = WScript.CreateObject("WScript.Shell") ' as object - the command shell
+	dim objExec: Set objExec = objShell.Exec(sCurlGetVersion) ' as object - the command to send
 	dim sCurlVersion 'as string
 	dim sLine 'as string
 	dim sResult 'as string
-
-	sCurlGetVersion = "curl -V" 'as string
-	Set objShell = WScript.CreateObject("WScript.Shell")
-	Set objExec = objShell.Exec(sCurlGetVersion)
 
 	Do
 		sLine = objExec.StdOut.ReadLine()
