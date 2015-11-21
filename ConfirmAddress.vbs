@@ -77,11 +77,12 @@ Do
 	sResult = sResult & sLine & vbcrlf
 Loop While Not objExec.Stdout.atEndOfStream
 
-'wscript.echo sResult
+wscript.echo sResult
 'if the returned result contains the sFailIndicator string it doesn't exist
-if instr(1, sResult, "CAN|1|433|17") > 0 then
+'if instr(1, sResult, "CAN|1|433|17") > 0 then
+if instr(1, sResult, "CAN|1") > 0 then
 	bAddressExists = False
-	wscript.echo "Address is Not Valid"
+	wscript.echo "No Address Found"
 else 
 	bAddressExists = True
 	'extract the returned address
@@ -90,8 +91,12 @@ else
 	sCanPostAddress = mid(sResult, iStart, iFinish - iStart)
 	with wscript
 		.echo "Searched for Address        :  " & sAddress
-		.echo "Canada Post Official Address:  " & sCanPostAddress
-		.echo "Result                      :  Address is Valid"
+		.echo "Canada Post Address Found   :  " & sCanPostAddress
+		if mid(sResult, 19, 1) = 1 then
+			.echo "Result                      :  A single possible address was found"
+		else
+			.echo "Result                      :  " & mid(sResult, 19, 1) & " Possible results found address listed is best guess"
+		end if 
 	end with 
 end if
 
