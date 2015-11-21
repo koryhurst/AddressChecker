@@ -28,9 +28,11 @@ if CurlVersionHandlesHTTPS = True then
 	ProcessResult(sReturned)
 end if
 
+
 wscript.quit
 
-function ProcessResult(sResult)
+
+function ProcessResult(byval sResult)
 	
 	'sFailIndicator = "CAN|1|433|17"
 	dim sFailIndicator: sFailIndicator = "CAN|1"'as string
@@ -63,7 +65,7 @@ function ProcessResult(sResult)
 
 end function
 
-function BuildCanadaPostURL(sAddress)
+function BuildCanadaPostURL(byval sAddress)
 
 	dim sDBLQuoteCode: sDBLQuoteCode = chr(34)'as string
 	dim sURLEncAddress 'as string
@@ -82,7 +84,7 @@ function BuildCanadaPostURL(sAddress)
 
 end function
 
-function GetResultFromURL(sURL)
+function GetResultFromURL(byval sURL)
 
 	dim objShell: Set objShell = WScript.CreateObject("WScript.Shell") ' as object - the command shell
 	dim objExec: Set objExec = objShell.Exec(sURL) ' as object - the command to send
