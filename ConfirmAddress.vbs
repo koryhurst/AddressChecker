@@ -48,7 +48,8 @@ function ProcessResult(byval sResult)
 			.echo "Canada Post Container Count  :  " & iContainerCount
 			.echo "Canada Post ID               :  " & sID
 			.echo "Canada Post Text             :  " & sCanPostText
-			if iContainerCount = 1 and isnumeric(right(sID, 7)) then
+'			if iContainerCount = 1 and isnumeric(right(sID, 7) then
+			if iContainerCount = 1 and mid(sID, 5, 1) = "B" then
 				.echo "Canada Post Address          :  " & sCanPostText
 				if sAddress = sCanPostText then
 					.echo "Result                       :  Valid Address.  A perfect match was found"
@@ -56,7 +57,7 @@ function ProcessResult(byval sResult)
 					.echo "Result                       :  Valid Address.  A single possible address was found.  Not a perfect match to search term."
 				end if
 			else
-				.echo "Result                       :  No distinct address found.  Sought after address either too poorly formed or not a valid address"
+				.echo "Result                       :  No distinct address found.  Address too poorly formed or not a valid address.  If multiple dwelling please include suite number."
 			end if
 		end with 
 
