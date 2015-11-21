@@ -8,32 +8,81 @@ option explicit
 'Canada Post - Postal Code Lookup URL
 'curl "https://ws1.postescanada-canadapost.ca/AddressComplete/Interactive/Find/v2.10/json3ex.ws?Key=ea98-jc42-tf94-jk98&Country=CAN&SearchTerm=2956"%"2029th"%"20a&LanguagePreference=en&LastId=&SearchFor=Everything&OrderBy=UserLocation&$block=true&$cache=true&MaxSuggestions=7&MaxResults=100" -H "Origin: https://www.canadapost.ca" -H "Accept-Encoding: gzip, deflate, sdch" -H "Accept-Language: en-US,en;q=0.8" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36" -H "Accept: */*" -H "Referer: https://www.canadapost.ca/cpo/mc/personal/postalcode/fpc.jsf" -H "Connection: keep-alive" --compressed
 
+dim colNamedArguments: Set colNamedArguments = WScript.Arguments.Named
 dim sAddress 'as string
 dim sURL' as string
 dim sReturned 'as string
+dim sInputFile ' as string
+dim sInputAddress ' as string
+dim sInputType ' as string
+dim bVerbose ' as boolean
 
 'on error resume next 
 call Include("CurlFunctions")
 
-sAddress = WScript.Arguments(0) 
-if sAddress = "" then
-	wscript.echo "Usage: cscript ConfirmAddress.vbs ""Address To Check"""
-	wscript.quit
+with colNamedArguments
+	'wscript.echo .Exists("InputFile")
+	'wscript.echo .Exists("InputAddress")
+	if .Exists("InputFile") = 0 and .Exists("InputAddress") = 0 then 
+		With wscript
+			.echo "One of the parameters InputFile or InputAddress is required"
+			.echo "Usage: "
+			.echo "cscript ConfirmAddress.vbs /InputFile:FileName.txt or /InputAddress=""Single Address To Check"" /Verbose:True|False"
+			.echo "Verbose is optional.  Default is False"
+			.quit
+		end with
+	elseif .Exists("InputFile") = -1 and .Exists("InputAddress") = -1 then 
+		With wscript
+			.echo "Either the parameter InputFile or the parameter InputAddress is required"
+			.echo "Usage: "
+			.echo "cscript ConfirmAddress.vbs /InputFile:FileName.txt or /InputAddress=""Single Address To Check"" /Verbose:True|False"
+			.echo "Verbose is optional.  Default is False"
+			.quit
+		end with		
+	elseif .Exists("InputFile") = -1 and .Exists("InputAddress") = 0 then 
+		wscript.echo "File detected"
+		sInputFile = .Item("InputFile")
+		wscript.echo sInputFile
+		sInputType = "File"
+	elseif .Exists("InputFile") = 0 and .Exists("InputAddress") = -1 then 
+		'wscript.echo "Single Address detected"
+		sInputAddress = .Item("InputAddress")
+		'wscript.echo sInputAddress
+		sInputType = "SingleAddress"
+	end if
+	bVerbose = .Item("Verbose")
+end with ' the colNamedArguments one
+
+if bVerbose = "" then 
+	bVerbose = False
 end if
 
 if CurlVersionHandlesHTTPS = True then 
-	'URL Encode the passed in address
-	sURL = BuildCanadaPostURL(sAddress)
-	sReturned = GetResultFromURL(sURL)
-	'wscript.echo sReturned
-	ProcessResult(sReturned)
+
+	if sInputType = "SingleAddress" then
+		'URL Encode the passed in address
+		sURL = BuildCanadaPostURL(sInputAddress)
+		sReturned = GetResultFromURL(sURL)
+		'wscript.echo sReturned
+		call ProcessSingleAddress(sInputAddress, sReturned)
+	else
+		dim fso: set fso = CreateObject("Scripting.FileSystemObject")
+'		dim sFullFileName:  sFullFileName = fso.BuildPath(CurrentDirectory, sInputFile)
+		dim oFile: set oFile = fso.OpenTextFile(sInputFile, 1)
+		dim sFileRow ' as string
+		Do While oFile.AtEndOfStream <> True
+			sFileRow = oFile.ReadLine
+			sURL = BuildCanadaPostURL(sFileRow)
+			sReturned = GetResultFromURL(sURL)
+			call ProcessSingleAddress(sFileRow, sReturned)
+		Loop
+		oFile.Close	
+	end if
 end if
-
-
 
 wscript.quit
 
-function ProcessResult(byval sResult)
+sub ProcessSingleAddress(byval sSearchTerm, byval sResult)
 	
 	dim iContainerCount ' as integer
 	dim sID ' as string
@@ -44,7 +93,7 @@ function ProcessResult(byval sResult)
 	sCanPostText = RetrieveCanadaPostParameter(sResult, "Text")
 	'if iContainerCount = 1 and isnumeric(right(sID, 7)) then
 		with wscript
-			.echo "Searched for Address         :  " & sAddress
+			.echo "Searched for Address         :  " & sSearchTerm
 			.echo "Canada Post Container Count  :  " & iContainerCount
 			.echo "Canada Post ID               :  " & sID
 			.echo "Canada Post Text             :  " & sCanPostText
@@ -61,7 +110,8 @@ function ProcessResult(byval sResult)
 			end if
 		end with 
 
-end function
+end sub
+
 function RetrieveCanadaPostParameter(byval sResultSet, byval sParameterName)
 
 	dim sDBLQuoteCode: sDBLQuoteCode = chr(34) 'as string
@@ -84,6 +134,7 @@ function RetrieveCanadaPostParameter(byval sResultSet, byval sParameterName)
 	RetrieveCanadaPostParameter = sReturnValue
 	
 end function
+
 function BuildCanadaPostURL(byval sAddress)
 
 	dim sDBLQuoteCode: sDBLQuoteCode = chr(34)'as string
@@ -102,7 +153,6 @@ function BuildCanadaPostURL(byval sAddress)
 	BuildCanadaPostURL = sBuiltUrl
 
 end function
-
 
 Sub Include(sFileName)
 
