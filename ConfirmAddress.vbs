@@ -1,4 +1,4 @@
-'option explicit
+option explicit
 'Success
 'usage cscript.exe ConfirmAddress.vbs "2977 29th Ave E, Vancouver, BC"
 'usage cscript.exe ConfirmAddress.vbs "2977 29th Ave East, Vancouver, BC"
@@ -96,9 +96,12 @@ if bClearedToProceed = True then
 	end if
 	
 end if
-	
+
 function CheckParameters(byval colNamedArguments)
 
+	'I could add something here to check for either verbose or output to file
+	'as it would be pointless otherwise.  But let's see what happens when the
+	'/Silent parameter is added
 	with colNamedArguments
 		'wscript.echo .Exists("InputFile")
 		'wscript.echo .Exists("InputAddress")
@@ -123,7 +126,7 @@ end function
 sub OutputHeader(byval aFieldWidths)
 
 	dim sFirstLine ' as string
-	'dim sSecondLine ' as string
+	dim sSecondLine ' as string
 	dim aHeaderText ' as array
 	dim iField ' as integer
 	dim iTotalWidth ' as integer
@@ -160,6 +163,7 @@ Sub OutputUsage
 		.echo "  params:"
 		.echo "  /InputFile:FileName.txt or /InputAddress=""Single Address To Check"" ONE REQUIRED"
 		.echo "  /Verbose:True|False  optional.  Default is False"
+		.echo "  /InputFile:FileName.txt (.txt suffix not required)"
 		.echo "  (Verbose optimized for minimum 150 character wide window)"
 	end with
 	call OutputNotes
