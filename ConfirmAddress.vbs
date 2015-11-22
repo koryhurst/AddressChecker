@@ -13,15 +13,22 @@ dim colNamedArguments: Set colNamedArguments = WScript.Arguments.Named
 dim sAddress 'as string
 dim sURL' as string
 dim sReturned 'as string
-dim sInputFile ' as string
 dim sInputAddress ' as string
-dim sInputType ' as string
 dim bVerbose ' as boolean
 dim sVerbose ' as string
 dim bClearedToProceed ' as boolean
 dim bCurlVersionOK ' as boolean
 dim bParametersOK ' as boolean
 dim aFieldWidths ' as array
+
+dim fso ' as file scripting object
+dim sInputType ' as string
+dim sInputFile ' as string
+dim oInputFile ' as File
+dim sOutputType ' as string
+dim sOutputFile ' as string
+dim oOutputFile ' as File
+
 
 'on error resume next 
 call Include("CurlFunctions")
@@ -46,6 +53,10 @@ if bClearedToProceed = True then
 			sInputAddress = .Item("InputAddress")
 			sInputType = "SingleAddress"
 		end if
+		if .Exists("OutputFile") = -1 then
+			sOutputFile = .Item("OutputFile")
+			sOutputType = "File"		
+		end if
 		sVerbose = .Item("Verbose")
 	end with ' the colNamedArguments one
 	
@@ -58,7 +69,18 @@ if bClearedToProceed = True then
 	if bVerbose = 1 then 
 		call OutputNotes
 	end if
-
+	
+	if sInputType = "File" or sOutputType = "File" then
+		set fso = CreateObject("Scripting.FileSystemObject")
+		if sInputType = "File" then
+			set oInputFile = fso.OpenTextFile(sInputFile, 1)
+		end if
+		if sOutputType = "File" then
+			set oOutputFile = fso.OpenTextFile(sOutputFile, 1)
+		end if	
+	end if
+		
+		
 	redim aFieldWidths(4)
 	aFieldWidths(0) = 54
 	aFieldWidths(1) = 8
@@ -74,13 +96,10 @@ if bClearedToProceed = True then
 		call OutputHeader(aFieldWidths)
 		call ProcessSingleAddress(sInputAddress, sReturned, aFieldWidths)
 	else
-		dim fso: set fso = CreateObject("Scripting.FileSystemObject")
-'		dim sFullFileName:  sFullFileName = fso.BuildPath(CurrentDirectory, sInputFile)
-		dim oFile: set oFile = fso.OpenTextFile(sInputFile, 1)
 		dim sFileRow ' as string
 		call OutputHeader(aFieldWidths)
-		Do While oFile.AtEndOfStream <> True
-			sFileRow = oFile.ReadLine
+		Do While oInputFile.AtEndOfStream <> True
+			sFileRow = oInputFile.ReadLine
 			'this if is just to allow blank rows in the source file for testing purposes
 			if sFileRow <> ""  then 
 				sURL = BuildCanadaPostURL(sFileRow)
@@ -92,7 +111,7 @@ if bClearedToProceed = True then
 				end if
 			end if
 		Loop
-		oFile.Close	
+		oInputFile.Close	
 	end if
 	
 end if
@@ -163,7 +182,7 @@ Sub OutputUsage
 		.echo "  params:"
 		.echo "  /InputFile:FileName.txt or /InputAddress=""Single Address To Check"" ONE REQUIRED"
 		.echo "  /Verbose:True|False  optional.  Default is False"
-		.echo "  /InputFile:FileName.txt (.txt suffix not required)"
+		.echo "  /OutputFile:FileName.txt (.txt suffix not required)"
 		.echo "  (Verbose optimized for minimum 150 character wide window)"
 	end with
 	call OutputNotes
