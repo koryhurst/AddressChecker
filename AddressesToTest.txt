@@ -1,12 +1,3 @@
-933 Seymour St, Vancouver
-1101 933 Seymour St, Vancouver
-1101 933 Seymour St, Vancouver, BC
-2960 29th Ave East, Vancouver, BC
-103 2960 29th Ave East, Vancouver, BC
-103 2960 29th Ave E, Vancouver, BC
-2138 Madison Ave, Burnaby, BC
-2501 2138 Madison Ave, Burnaby, BC
-
 2958 29th Ave East, Vancouver, BC
 
 44 Eldorado Close NE, Calgary, AB
@@ -22,3 +13,20 @@
 58 kimberl
 58 Kimberly kapuskasing
 58 Kimberly Dr, Kapuskasing, ON
+
+933 Seymour St, Vancouver
+1101 933 Seymour St, Vancouver
+1101 933 Seymour St, Vancouver, BC
+2960 29th Ave East, Vancouver, BC
+103 2960 29th Ave East, Vancouver, BC
+103 2960 29th Ave E, Vancouver, BC
+2138 Madison Ave, Burnaby, BC
+2501 2138 Madison Ave, Burnaby, BC
+
+2565 Cornwall Avenue, Vancouver, BC, V6K1C1, CA
+
+2565 Cornwall Avenue, Vancouver, BC
+1610 Haro Street, Vancouver, BC
+1718 Henderson lake blvd. S, Lethbridge, AB
+
+2472 West 4th Avenue, Vancouver, BC

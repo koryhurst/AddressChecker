@@ -297,6 +297,7 @@ Sub OutputNotes
 		.echo "	  Result Code 2:  Valid Address.  A perfect match was found"
 		.echo "		"
 		.echo "	  Designated multiple dwelling addresses without the suite number return code 0"
+		.echo "	  Do not include postal codes with addresses.  They will resolve to 0."
 		.echo "		"
 	end with 
 	
