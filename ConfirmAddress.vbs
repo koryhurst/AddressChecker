@@ -4,15 +4,21 @@ option explicit
 'curl "https://ws1.postescanada-canadapost.ca/AddressComplete/Interactive/Find/v2.10/json3ex.ws?Key=ea98-jc42-tf94-jk98&Country=CAN&SearchTerm=2956"%"2029th"%"20a&LanguagePreference=en&LastId=&SearchFor=Everything&OrderBy=UserLocation&$block=true&$cache=true&MaxSuggestions=7&MaxResults=100" -H "Origin: https://www.canadapost.ca" -H "Accept-Encoding: gzip, deflate, sdch" -H "Accept-Language: en-US,en;q=0.8" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36" -H "Accept: */*" -H "Referer: https://www.canadapost.ca/cpo/mc/personal/postalcode/fpc.jsf" -H "Connection: keep-alive" --compressed
 
 dim colNamedArguments: Set colNamedArguments = WScript.Arguments.Named
+
 dim sAddress 'as string
 dim sURL' as string
 dim sReturned 'as string
 dim sInputAddress ' as string
+
 dim bVerbose ' as boolean
 dim sVerbose ' as string
+dim bSilent ' as boolean
+dim sSilent ' as boolean
+
 dim bClearedToProceed ' as boolean
 dim bCurlVersionOK ' as boolean
 dim bParametersOK ' as boolean
+
 dim aFieldWidths ' as array
 
 dim fso ' as file scripting object
@@ -22,7 +28,6 @@ dim oInputFile ' as File
 dim sOutputType ' as string
 dim sOutputFile ' as string
 dim oOutputFile ' as File
-
 
 'on error resume next 
 call Include("CurlFunctions")
@@ -35,9 +40,6 @@ bClearedToProceed = False
 bParametersOK = CheckParameters(colNamedArguments)
 bCurlVersionOK = CurlVersionHandlesHTTPS
 bClearedToProceed = bParametersOK and bCurlVersionOK
-
-call OutputUsage
-call OutputNotes
 
 if bClearedToProceed = True then 
 	with colNamedArguments
@@ -55,12 +57,24 @@ if bClearedToProceed = True then
 			sOutputType = "File"		
 		end if
 		sVerbose = .Item("Verbose")
-	end with ' the colNamedArguments one
+		sSilent = .Item("Silent")
+		end with ' the colNamedArguments one
 	
 	if sVerbose = "True" then
 		bVerbose = 1
 	else 
 		bVerbose = 0
+	end if
+
+	if sSilent = "True" then
+		bSilent = 1
+	else 
+		bSilent = 0
+	end if
+
+	if bSilent = 0 then
+		call OutputUsage
+		call OutputNotes
 	end if
 
 	if sInputType = "File" or sOutputType = "File" then
@@ -69,14 +83,10 @@ if bClearedToProceed = True then
 			set oInputFile = fso.OpenTextFile(sInputFile, 1)
 		end if
 		if sOutputType = "File" then
-			
 			set oOutputFile = fso.CreateTextFile(sOutputFile,True)
-'			set oOutputFile = fso.OpenTextFile(sOutputFile, 2)
-		
 		end if	
 	end if
-		
-		
+				
 	redim aFieldWidths(4)
 	aFieldWidths(0) = 54
 	aFieldWidths(1) = 8
@@ -84,6 +94,8 @@ if bClearedToProceed = True then
 	aFieldWidths(3) = 18
 	aFieldWidths(4) = 54
 
+	'wscript.echo "Query Type:  " & sInputType
+	
 	if bVerbose = 1 then 
 		call OutputHeader(aFieldWidths)
 	end if
@@ -95,9 +107,22 @@ if bClearedToProceed = True then
 		'wscript.echo sReturned
 		call ProcessSingleAddress(sInputAddress, sReturned, aFieldWidths, oOutputFile, sOutputType, bVerbose)
 	else
-		'This variable should be renamed and the dim moved to the top
+		
+		'These variable should be renamed and the dim moved to the top
 		dim sFileRow ' as string
+		dim iFileRow: iFileRow = 0 ' integer
+		
+		if bSilent = 0 and bVerbose = 0 then
+			wscript.stdout.write "Processing Line: "
+		end if 
 		Do While oInputFile.AtEndOfStream <> True
+			if bSilent = 0 and bVerbose = 0 then
+				iFileRow = iFileRow + 1
+				if iFileRow <> 1 then
+					wscript.stdout.write string(len(iFileRow), chr(8)) ' backspace Character 	
+				end if
+				wscript.stdout.write iFileRow 
+			end if 
 			sFileRow = oInputFile.ReadLine
 			'this if is just to allow blank rows in the source file for testing purposes
 			if sFileRow <> ""  then 
@@ -197,6 +222,14 @@ function CheckParameters(byval colNamedArguments)
 				.quit
 			end with	
 		end if
+		if .Exists("Verbose") = -1 and .Exists("Silent") = -1 then 
+			if .item("Verbose") = "True" and .item("Silent") = "True" then
+				With wscript
+					.echo "Error both silent and verbose cannot be selected"
+					.quit
+				end with
+			end if
+		end if
 	end with
 	CheckParameters = True
 	
@@ -237,17 +270,18 @@ end sub
 Sub OutputUsage
 		
 	with wscript
+		.echo "		"
 		.echo "	Usage: "
-		.echo "		cscript ConfirmAddress.vbs params"
-		.echo "			params:"
-		.echo "				/InputFile:FileName.txt or /InputAddress=""Single Address To Check"" ONE REQUIRED"
-		.echo "				/Verbose:True|False  optional.  Default is False"
-		.echo "					(Verbose optimized for minimum 150 character wide window)"
-		.echo "					(Verbose Output has the Canada Post address truncated when result code is 0)"
-		.echo "				/OutputFile:FileName.txt"
-		.echo "					(File Output does not have the Canada Post address truncated when result code is 0)"
-		.echo	"					(.txt suffix not required)"
-		.echo	"					(if file exists it will be overwritten)"
+		.echo "	  cscript ConfirmAddress.vbs params"
+		.echo "	  params:"
+		.echo "	    /InputFile:FileName.txt or /InputAddress=""Single Address To Check"" ONE REQUIRED"
+		.echo "	    /Verbose:True|False  optional.  Default is False"
+		.echo "	      (Verbose optimized for minimum 150 character wide window)"
+		.echo "	      (Verbose Output has the Canada Post address truncated when result code is 0)"
+		.echo "	    /OutputFile:FileName.txt"
+		.echo "	      (File Output does not have the Canada Post address truncated when result code is 0)"
+		.echo	"	      (.txt suffix not required)"
+		.echo	"	      (if file exists it will be overwritten)"
 	end with
 		
 end sub
@@ -256,12 +290,13 @@ Sub OutputNotes
 	
 	with wscript
 		.echo "		"
-		.echo "		Notes: "
-		.echo "		Result Code 2:  Valid Address.  A perfect match was found"
-		.echo "		Result Code 1:  Valid Address.  A single possible address was found.  Not a perfect match to search term."
-		.echo "		Result Code 0:  No distinct address found.  Address too poorly formed or not a valid address."
+		.echo "	Notes: "
 		.echo "		"
-		.echo "		Designated multiple dwelling addresses without the suite number return code 0"
+		.echo "	  Result Code 0:  No distinct address found.  Address too poorly formed or not a valid address."
+		.echo "	  Result Code 1:  Valid Address.  A single possible address was found.  Not a perfect match to search term."
+		.echo "	  Result Code 2:  Valid Address.  A perfect match was found"
+		.echo "		"
+		.echo "	  Designated multiple dwelling addresses without the suite number return code 0"
 		.echo "		"
 	end with 
 	
