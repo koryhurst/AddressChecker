@@ -76,10 +76,7 @@ if bClearedToProceed = True then
 			set oInputFile = fso.OpenTextFile(sInputFile, 1)
 		end if
 		if sOutputType = "File" then
-			
-			set oOutputFile = fso.CreateTextFile(sOutputFile,True)
-'			set oOutputFile = fso.OpenTextFile(sOutputFile, 2)
-		
+			set oOutputFile = fso.OpenTextFile(sOutputFile, 1)
 		end if	
 	end if
 		
@@ -107,7 +104,7 @@ if bClearedToProceed = True then
 			if sFileRow <> ""  then 
 				sURL = BuildCanadaPostURL(sFileRow)
 				sReturned = GetResultFromURL(sURL)
-				call ProcessSingleAddress(sFileRow, sReturned, aFieldWidths, oOutputFile, sOutputType)
+				call ProcessSingleAddress(sFileRow, sReturned, aFieldWidths)
 			else
 				if bVerbose = 1 then
 					wscript.echo ""
@@ -118,67 +115,6 @@ if bClearedToProceed = True then
 	end if
 	
 end if
-
-sub OutputRowToFile(aResults, oOutputFile)
-	
-	dim sDBLQuoteCode: sDBLQuoteCode = chr(34)'as string
-	dim iField ' as integer
-	dim sOutput 'as string
-	
-	for iField = 0 to 4
-		sOutput = sOutput & sDBLQuoteCode & aResults(iField) & sDBLQuoteCode & ";" 
-		' Random delimiter may have to trim it off the end
-	next	
-	oOutputFile.writeline(sOutput)
-
-end sub
-
-sub ProcessSingleAddress(byval sSearchTerm, byval sResult, byval aFieldWidths, byval oOutputFile, byval sOutputType)
-	
-	dim iContainerCount ' as integer
-	dim sID ' as string
-	dim sCanPostText ' as string
-	dim sOutputLine ' as string
-	dim iResultCode ' as integer
-	dim aResults ' as array
-	
-	iContainerCount = RetrieveCanadaPostParameter(sResult, "ContainerCount")
-	sID = RetrieveCanadaPostParameter(sResult, "Id")
-	sCanPostText = RetrieveCanadaPostParameter(sResult, "Text")
-
-	if iContainerCount = 1 and mid(sID, 5, 1) = "B" then
-		'wscript.echo sAddress & " - " & sCanPostText
-		if sSearchTerm = sCanPostText then
-			iResultCode = 2
-		else
-			iResultCode = 1
-		end if
-	else
-		iResultCode = 0
-	end if
-	' this will probably have to be bullet proofed against addresses longer that the field lengths
-	sOutputLine = sOutputLine & sSearchTerm & string(aFieldWidths(0) - len(sSearchTerm), " ")
-	sOutputLine = sOutputLine & iResultCode & string(aFieldWidths(1) - len(iResultCode), " ")
-	sOutputLine = sOutputLine & iContainerCount & string(aFieldWidths(2) - len(iContainerCount), " ")
-	sOutputLine = sOutputLine & sID & string(aFieldWidths(3) - len(sID), " ")
-	if iResultCode <> 0 then 
-		sOutputLine = sOutputLine & sCanPostText & string(aFieldWidths(4) - len(sCanPostText), " ")
-	else 
-		sOutputLine = sOutputLine & left(sCanPostText, aFieldWidths(4) - 4) & "..."
-	end if
- 
-	wscript.echo sOutputLine
-	
-	if sOutputType = "File" then 
-		redim aResults(4)
-		aResults(0) = sSearchTerm
-		aResults(1) = iResultCode
-		aResults(2) = iContainerCount
-		aResults(3) = sID
-		aResults(4) = sCanPostText
-		call OutputRowToFile(aResults, oOutputFile)
-	end if 
-end sub
 
 function CheckParameters(byval colNamedArguments)
 
@@ -246,10 +182,8 @@ Sub OutputUsage
 		.echo "  params:"
 		.echo "  /InputFile:FileName.txt or /InputAddress=""Single Address To Check"" ONE REQUIRED"
 		.echo "  /Verbose:True|False  optional.  Default is False"
-		.echo "    (Verbose optimized for minimum 150 character wide window)"
-		.echo "  /OutputFile:FileName.txt"
-		.echo	"		 (.txt suffix not required)"
-		.echo	"		 (if file exists it will be overwritten)"
+		.echo "  /OutputFile:FileName.txt (.txt suffix not required)"
+		.echo "  (Verbose optimized for minimum 150 character wide window)"
 	end with
 	call OutputNotes
 		
@@ -263,13 +197,48 @@ Sub OutputNotes
 		.echo "Result Code 1:  Valid Address.  A single possible address was found.  Not a perfect match to search term."
 		.echo "Result Code 0:  No distinct address found.  Address too poorly formed or not a valid address.  "
 		.echo " "
-		.echo "Designated multiple dwelling addresses without the suite number return code 0"
-		.echo " "
-		.echo "Verbose Output has the result address truncated if necessary while output to file does not truncate"
+		.echo "**Designated multiple dwelling addresses without the suite number return code 0"
 		.echo " "
 	end with 
 	
 end Sub
+
+sub ProcessSingleAddress(byval sSearchTerm, byval sResult, byval aFieldWidths)
+	
+	dim iContainerCount ' as integer
+	dim sID ' as string
+	dim sCanPostText ' as string
+	dim sOutputLine ' as string
+	dim iResultCode ' as integer
+
+	iContainerCount = RetrieveCanadaPostParameter(sResult, "ContainerCount")
+	sID = RetrieveCanadaPostParameter(sResult, "Id")
+	sCanPostText = RetrieveCanadaPostParameter(sResult, "Text")
+
+	if iContainerCount = 1 and mid(sID, 5, 1) = "B" then
+		'wscript.echo sAddress & " - " & sCanPostText
+		if sSearchTerm = sCanPostText then
+			iResultCode = 2
+		else
+			iResultCode = 1
+		end if
+	else
+		iResultCode = 0
+	end if
+	' this will probably have to be bullet proofed against addresses longer that the field lengths
+	sOutputLine = sOutputLine & sSearchTerm & string(aFieldWidths(0) - len(sSearchTerm), " ")
+	sOutputLine = sOutputLine & iResultCode & string(aFieldWidths(1) - len(iResultCode), " ")
+	sOutputLine = sOutputLine & iContainerCount & string(aFieldWidths(2) - len(iContainerCount), " ")
+	sOutputLine = sOutputLine & sID & string(aFieldWidths(3) - len(sID), " ")
+	if iResultCode <> 0 then 
+		sOutputLine = sOutputLine & sCanPostText & string(aFieldWidths(4) - len(sCanPostText), " ")
+	else 
+		sOutputLine = sOutputLine & left(sCanPostText, aFieldWidths(4) - 4) & "..."
+	end if
+ 
+	wscript.echo sOutputLine
+	
+end sub
 
 function RetrieveCanadaPostParameter(byval sResultSet, byval sParameterName)
 
