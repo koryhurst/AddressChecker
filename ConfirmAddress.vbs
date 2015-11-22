@@ -94,14 +94,16 @@ if bClearedToProceed = True then
 		call ProcessSingleAddress(sInputAddress, sReturned, aFieldWidths)
 	else
 		dim sFileRow ' as string
-		call OutputHeader(aFieldWidths)
+		if bVerbose = 1 then 
+			call OutputHeader(aFieldWidths)
+		end if
 		Do While oInputFile.AtEndOfStream <> True
 			sFileRow = oInputFile.ReadLine
 			'this if is just to allow blank rows in the source file for testing purposes
 			if sFileRow <> ""  then 
 				sURL = BuildCanadaPostURL(sFileRow)
 				sReturned = GetResultFromURL(sURL)
-				call ProcessSingleAddress(sFileRow, sReturned, aFieldWidths, oOutputFile, sOutputType)
+				call ProcessSingleAddress(sFileRow, sReturned, aFieldWidths, oOutputFile, sOutputType, bVerbose)
 			else
 				if bVerbose = 1 then
 					wscript.echo ""
@@ -127,7 +129,7 @@ sub OutputRowToFile(aResults, oOutputFile)
 
 end sub
 
-sub ProcessSingleAddress(byval sSearchTerm, byval sResult, byval aFieldWidths, byval oOutputFile, byval sOutputType)
+sub ProcessSingleAddress(byval sSearchTerm, byval sResult, byval aFieldWidths, byval oOutputFile, byval sOutputType, byval sVerbose)
 	
 	dim iContainerCount ' as integer
 	dim sID ' as string
@@ -150,18 +152,20 @@ sub ProcessSingleAddress(byval sSearchTerm, byval sResult, byval aFieldWidths, b
 	else
 		iResultCode = 0
 	end if
-	' this will probably have to be bullet proofed against addresses longer that the field lengths
-	sOutputLine = sOutputLine & sSearchTerm & string(aFieldWidths(0) - len(sSearchTerm), " ")
-	sOutputLine = sOutputLine & iResultCode & string(aFieldWidths(1) - len(iResultCode), " ")
-	sOutputLine = sOutputLine & iContainerCount & string(aFieldWidths(2) - len(iContainerCount), " ")
-	sOutputLine = sOutputLine & sID & string(aFieldWidths(3) - len(sID), " ")
-	if iResultCode <> 0 then 
-		sOutputLine = sOutputLine & sCanPostText & string(aFieldWidths(4) - len(sCanPostText), " ")
-	else 
-		sOutputLine = sOutputLine & left(sCanPostText, aFieldWidths(4) - 4) & "..."
+	
+	if bVerbose = 1 then
+		' this will probably have to be bullet proofed against addresses longer that the field lengths
+		sOutputLine = sOutputLine & sSearchTerm & string(aFieldWidths(0) - len(sSearchTerm), " ")
+		sOutputLine = sOutputLine & iResultCode & string(aFieldWidths(1) - len(iResultCode), " ")
+		sOutputLine = sOutputLine & iContainerCount & string(aFieldWidths(2) - len(iContainerCount), " ")
+		sOutputLine = sOutputLine & sID & string(aFieldWidths(3) - len(sID), " ")
+		if iResultCode <> 0 then 
+			sOutputLine = sOutputLine & sCanPostText & string(aFieldWidths(4) - len(sCanPostText), " ")
+		else 
+			sOutputLine = sOutputLine & left(sCanPostText, aFieldWidths(4) - 4) & "..."
+		end if
+		wscript.echo sOutputLine
 	end if
- 
-	wscript.echo sOutputLine
 	
 	if sOutputType = "File" then 
 		redim aResults(4)
