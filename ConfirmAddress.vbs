@@ -1,9 +1,4 @@
 option explicit
-'Success
-'usage cscript.exe ConfirmAddress.vbs "2977 29th Ave E, Vancouver, BC"
-'usage cscript.exe ConfirmAddress.vbs "2977 29th Ave East, Vancouver, BC"
-'Fail (illustrating a real invalid address)
-'usage cscript.exe ConfirmAddress.vbs "2958 29th Ave East, Vancouver, BC"
 
 'Canada Post - Postal Code Lookup URL
 'curl "https://ws1.postescanada-canadapost.ca/AddressComplete/Interactive/Find/v2.10/json3ex.ws?Key=ea98-jc42-tf94-jk98&Country=CAN&SearchTerm=2956"%"2029th"%"20a&LanguagePreference=en&LastId=&SearchFor=Everything&OrderBy=UserLocation&$block=true&$cache=true&MaxSuggestions=7&MaxResults=100" -H "Origin: https://www.canadapost.ca" -H "Accept-Encoding: gzip, deflate, sdch" -H "Accept-Language: en-US,en;q=0.8" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36" -H "Accept: */*" -H "Referer: https://www.canadapost.ca/cpo/mc/personal/postalcode/fpc.jsf" -H "Connection: keep-alive" --compressed
@@ -12,14 +7,22 @@ dim colNamedArguments: Set colNamedArguments = WScript.Arguments.Named
 dim sAddress 'as string
 dim sURL' as string
 dim sReturned 'as string
-dim sInputFile ' as string
 dim sInputAddress ' as string
-dim sInputType ' as string
 dim bVerbose ' as boolean
 dim sVerbose ' as string
 dim bClearedToProceed ' as boolean
 dim bCurlVersionOK ' as boolean
 dim bParametersOK ' as boolean
+dim aFieldWidths ' as array
+
+dim fso ' as file scripting object
+dim sInputType ' as string
+dim sInputFile ' as string
+dim oInputFile ' as File
+dim sOutputType ' as string
+dim sOutputFile ' as string
+dim oOutputFile ' as File
+
 
 'on error resume next 
 call Include("CurlFunctions")
@@ -44,6 +47,10 @@ if bClearedToProceed = True then
 			sInputAddress = .Item("InputAddress")
 			sInputType = "SingleAddress"
 		end if
+		if .Exists("OutputFile") = -1 then
+			sOutputFile = .Item("OutputFile")
+			sOutputType = "File"		
+		end if
 		sVerbose = .Item("Verbose")
 	end with ' the colNamedArguments one
 	
@@ -57,32 +64,121 @@ if bClearedToProceed = True then
 		call OutputNotes
 	end if
 	
+	if sInputType = "File" or sOutputType = "File" then
+		set fso = CreateObject("Scripting.FileSystemObject")
+		if sInputType = "File" then
+			set oInputFile = fso.OpenTextFile(sInputFile, 1)
+		end if
+		if sOutputType = "File" then
+			
+			set oOutputFile = fso.CreateTextFile(sOutputFile,True)
+'			set oOutputFile = fso.OpenTextFile(sOutputFile, 2)
+		
+		end if	
+	end if
+		
+		
+	redim aFieldWidths(4)
+	aFieldWidths(0) = 54
+	aFieldWidths(1) = 8
+	aFieldWidths(2) = 12
+	aFieldWidths(3) = 18
+	aFieldWidths(4) = 54
+
 	if sInputType = "SingleAddress" then
 		'URL Encode the passed in address
 		sURL = BuildCanadaPostURL(sInputAddress)
 		sReturned = GetResultFromURL(sURL)
 		'wscript.echo sReturned
-		call ProcessSingleAddress(sInputAddress, sReturned)
+		call OutputHeader(aFieldWidths)
+		call ProcessSingleAddress(sInputAddress, sReturned, aFieldWidths)
 	else
-		dim fso: set fso = CreateObject("Scripting.FileSystemObject")
-'		dim sFullFileName:  sFullFileName = fso.BuildPath(CurrentDirectory, sInputFile)
-		dim oFile: set oFile = fso.OpenTextFile(sInputFile, 1)
 		dim sFileRow ' as string
-		Do While oFile.AtEndOfStream <> True
-			sFileRow = oFile.ReadLine
-			sURL = BuildCanadaPostURL(sFileRow)
-			sReturned = GetResultFromURL(sURL)
-			call ProcessSingleAddress(sFileRow, sReturned)
+		call OutputHeader(aFieldWidths)
+		Do While oInputFile.AtEndOfStream <> True
+			sFileRow = oInputFile.ReadLine
+			'this if is just to allow blank rows in the source file for testing purposes
+			if sFileRow <> ""  then 
+				sURL = BuildCanadaPostURL(sFileRow)
+				sReturned = GetResultFromURL(sURL)
+				call ProcessSingleAddress(sFileRow, sReturned, aFieldWidths, oOutputFile, sOutputType)
+			else
+				if bVerbose = 1 then
+					wscript.echo ""
+				end if
+			end if
 		Loop
-		oFile.Close	
+		oInputFile.Close	
 	end if
 	
 end if
 
-wscript.quit
+sub OutputRowToFile(aResults, oOutputFile)
+	
+	dim sDBLQuoteCode: sDBLQuoteCode = chr(34)'as string
+	dim iField ' as integer
+	dim sOutput 'as string
+	
+	for iField = 0 to 4
+		sOutput = sOutput & sDBLQuoteCode & aResults(iField) & sDBLQuoteCode & ";" 
+		' Random delimiter may have to trim it off the end
+	next	
+	oOutputFile.writeline(sOutput)
+
+end sub
+
+sub ProcessSingleAddress(byval sSearchTerm, byval sResult, byval aFieldWidths, byval oOutputFile, byval sOutputType)
+	
+	dim iContainerCount ' as integer
+	dim sID ' as string
+	dim sCanPostText ' as string
+	dim sOutputLine ' as string
+	dim iResultCode ' as integer
+	dim aResults ' as array
+	
+	iContainerCount = RetrieveCanadaPostParameter(sResult, "ContainerCount")
+	sID = RetrieveCanadaPostParameter(sResult, "Id")
+	sCanPostText = RetrieveCanadaPostParameter(sResult, "Text")
+
+	if iContainerCount = 1 and mid(sID, 5, 1) = "B" then
+		'wscript.echo sAddress & " - " & sCanPostText
+		if sSearchTerm = sCanPostText then
+			iResultCode = 2
+		else
+			iResultCode = 1
+		end if
+	else
+		iResultCode = 0
+	end if
+	' this will probably have to be bullet proofed against addresses longer that the field lengths
+	sOutputLine = sOutputLine & sSearchTerm & string(aFieldWidths(0) - len(sSearchTerm), " ")
+	sOutputLine = sOutputLine & iResultCode & string(aFieldWidths(1) - len(iResultCode), " ")
+	sOutputLine = sOutputLine & iContainerCount & string(aFieldWidths(2) - len(iContainerCount), " ")
+	sOutputLine = sOutputLine & sID & string(aFieldWidths(3) - len(sID), " ")
+	if iResultCode <> 0 then 
+		sOutputLine = sOutputLine & sCanPostText & string(aFieldWidths(4) - len(sCanPostText), " ")
+	else 
+		sOutputLine = sOutputLine & left(sCanPostText, aFieldWidths(4) - 4) & "..."
+	end if
+ 
+	wscript.echo sOutputLine
+	
+	if sOutputType = "File" then 
+		redim aResults(4)
+		aResults(0) = sSearchTerm
+		aResults(1) = iResultCode
+		aResults(2) = iContainerCount
+		aResults(3) = sID
+		aResults(4) = sCanPostText
+		call OutputRowToFile(aResults, oOutputFile)
+	end if 
+end sub
 
 function CheckParameters(byval colNamedArguments)
 
+	'I could add something here to check for either verbose or output to file
+	'as it would be pointless otherwise.  But let's see what happens when the
+	'/Silent parameter is added
 	with colNamedArguments
 		'wscript.echo .Exists("InputFile")
 		'wscript.echo .Exists("InputAddress")
@@ -104,18 +200,55 @@ function CheckParameters(byval colNamedArguments)
 	
 end function
 
+sub OutputHeader(byval aFieldWidths)
+
+	dim sFirstLine ' as string
+	dim sSecondLine ' as string
+	dim aHeaderText ' as array
+	dim iField ' as integer
+	dim iTotalWidth ' as integer
+	
+	redim aHeaderText(4, 1)
+	aHeaderText(0, 0) = "Search Address"
+	aHeaderText(1, 0) = "Result"
+	aHeaderText(2, 0) = "Container"
+	aHeaderText(3, 0) = "Canada"
+	aHeaderText(4, 0) = "Canada Post Official Address"
+	aHeaderText(0, 1) = ""
+	aHeaderText(1, 1) = "Code"
+	aHeaderText(2, 1) = "Count"
+	aHeaderText(3, 1) = "Post Id"
+	aHeaderText(4, 1) = ""
+
+	for iField = 0 to 4
+		'wscript.echo aFieldWidths(iField) & ", " & len(aHeaderText(iField))
+		sFirstLine = sFirstLine & aHeaderText(iField, 0) & string(aFieldWidths(iField) - len(aHeaderText(iField, 0)), " ")
+		sSecondLine = sSecondLine & aHeaderText(iField, 1) & string(aFieldWidths(iField) - len(aHeaderText(iField, 1)), " ")
+		iTotalWidth = iTotalWidth + aFieldWidths(iField)
+	next
+	wscript.echo string(iTotalWidth, "=")
+	wscript.echo sFirstLine
+	wscript.echo sSecondLine
+	wscript.echo string(iTotalWidth, "=")
+end sub
+
 Sub OutputUsage
 		
-		with wscript
-			.echo "Usage: "
-			.echo "  cscript ConfirmAddress.vbs params"
-			.echo "  params:"
-			.echo "  /InputFile:FileName.txt or /InputAddress=""Single Address To Check"" ONE REQUIRED"
-			.echo "  /Verbose:True|False  optional.  Default is False"
-		end with
-		call OutputNotes
+	with wscript
+		.echo "Usage: "
+		.echo "  cscript ConfirmAddress.vbs params"
+		.echo "  params:"
+		.echo "  /InputFile:FileName.txt or /InputAddress=""Single Address To Check"" ONE REQUIRED"
+		.echo "  /Verbose:True|False  optional.  Default is False"
+		.echo "    (Verbose optimized for minimum 150 character wide window)"
+		.echo "  /OutputFile:FileName.txt"
+		.echo	"		 (.txt suffix not required)"
+		.echo	"		 (if file exists it will be overwritten)"
+	end with
+	call OutputNotes
 		
 end sub
+
 Sub OutputNotes
 	
 	with wscript
@@ -124,42 +257,13 @@ Sub OutputNotes
 		.echo "Result Code 1:  Valid Address.  A single possible address was found.  Not a perfect match to search term."
 		.echo "Result Code 0:  No distinct address found.  Address too poorly formed or not a valid address.  "
 		.echo " "
-		.echo "**Multiple dwelling addresses without the suite number return code 0"
+		.echo "Designated multiple dwelling addresses without the suite number return code 0"
+		.echo " "
+		.echo "Verbose Output has the result address truncated if necessary while output to file does not truncate"
 		.echo " "
 	end with 
 	
 end Sub
-sub ProcessSingleAddress(byval sSearchTerm, byval sResult)
-	
-	dim iContainerCount ' as integer
-	dim sID ' as string
-	dim sCanPostText ' as string
-	
-	iContainerCount = RetrieveCanadaPostParameter(sResult, "ContainerCount")
-	sID = RetrieveCanadaPostParameter(sResult, "Id")
-	sCanPostText = RetrieveCanadaPostParameter(sResult, "Text")
-	'this output now has to be columnized
-	'if iContainerCount = 1 and isnumeric(right(sID, 7)) then
-	with wscript
-		.echo "Searched for Address         :  " & sSearchTerm
-		.echo "Canada Post Container Count  :  " & iContainerCount
-		.echo "Canada Post ID               :  " & sID
-		.echo "Canada Post Text             :  " & sCanPostText
-'			if iContainerCount = 1 and isnumeric(right(sID, 7) then
-		if iContainerCount = 1 and mid(sID, 5, 1) = "B" then
-			.echo "Canada Post Address          :  " & sCanPostText
-			if sAddress = sCanPostText then
-				.echo "Result Code                  :  2"
-			else
-				.echo "Result Code                  :  1"
-			end if
-		else
-				.echo "Result Code                  :  0"
-		end if
-		.echo " " 'spacer
-	end with 
-
-end sub
 
 function RetrieveCanadaPostParameter(byval sResultSet, byval sParameterName)
 
