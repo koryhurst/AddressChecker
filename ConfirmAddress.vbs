@@ -302,7 +302,8 @@ Sub OutputNotes
 		.echo "		"
 		.echo "	  Designated multiple dwelling addresses without the suite number return code 0"
 		.echo "	  Do not include postal codes with addresses.  They will resolve to 0."
-		.echo "		Debug:  if the a line in the input file begins with ""comment"" it will be output to the screen in verbose mode"
+		.echo "		"
+		.echo "		Debug:  If a line in the input file begins with ""comment"" it will be output to the screen in verbose mode"
 	end with 
 	
 end Sub
