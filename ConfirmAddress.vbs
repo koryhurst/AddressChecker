@@ -32,7 +32,7 @@ dim oOutputFile ' as File
 'on error resume next 
 call Include("CurlFunctions")
 
-'This whole section should be functionalized
+'This whole section should be functionalized 
 'at least the check to have the right parameters
 'Then back here at main I can assign them if bClearedToProceed is true
 bClearedToProceed = False
