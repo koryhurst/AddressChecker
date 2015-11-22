@@ -43,21 +43,19 @@ bClearedToProceed = bParametersOK and bCurlVersionOK
 
 if bClearedToProceed = True then 
 	with colNamedArguments
-		'wscript.echo .Exists("InputFile")
-		'wscript.echo .Exists("InputAddress")
-		if .Exists("InputFile") = -1 and .Exists("InputAddress") = 0 then 
-			sInputFile = .Item("InputFile")
+		if .Exists("IF") = -1 and .Exists("IA") = 0 then 
+			sInputFile = .Item("IF")
 			sInputType = "File"
-		elseif .Exists("InputFile") = 0 and .Exists("InputAddress") = -1 then 
-			sInputAddress = .Item("InputAddress")
+		elseif .Exists("IF") = 0 and .Exists("IA") = -1 then 
+			sInputAddress = .Item("IA")
 			sInputType = "SingleAddress"
 		end if
-		if .Exists("OutputFile") = -1 then
-			sOutputFile = .Item("OutputFile")
+		if .Exists("OF") = -1 then
+			sOutputFile = .Item("OF")
 			sOutputType = "File"		
 		end if
-		sVerbose = .Item("Verbose")
-		sSilent = .Item("Silent")
+		sVerbose = .Item("V")
+		sSilent = .Item("S")
 		end with ' the colNamedArguments one
 	
 	if sVerbose = "True" then
@@ -215,21 +213,27 @@ function CheckParameters(byval colNamedArguments)
 	with colNamedArguments
 		'wscript.echo .Exists("InputFile")
 		'wscript.echo .Exists("InputAddress")
-		if .Exists("InputFile") = 0 and .Exists("InputAddress") = 0 then 
+		if .Exists("IF") = 0 and .Exists("IA") = 0 then 
 			With wscript
 				.echo "Error One of the parameters InputFile or InputAddress is required"
+				call OutputUsage
+				call OutputNotes
 				.quit
 			end with
-		elseif .Exists("InputFile") = -1 and .Exists("InputAddress") = -1 then 
+		elseif .Exists("IF") = -1 and .Exists("IA") = -1 then 
 			With wscript
 				.echo "Either the parameter InputFile or the parameter InputAddress is required"
+				call OutputUsage
+				call OutputNotes
 				.quit
 			end with	
 		end if
-		if .Exists("Verbose") = -1 and .Exists("Silent") = -1 then 
-			if .item("Verbose") = "True" and .item("Silent") = "True" then
+		if .Exists("V") = -1 and .Exists("S") = -1 then 
+			if .item("V") = "True" and .item("S") = "True" then
 				With wscript
 					.echo "Error both silent and verbose cannot be selected"
+					call OutputUsage
+					call OutputNotes
 					.quit
 				end with
 			end if
@@ -278,14 +282,17 @@ Sub OutputUsage
 		.echo "	Usage: "
 		.echo "	  cscript ConfirmAddress.vbs params"
 		.echo "	  params:"
-		.echo "	    /InputFile:FileName.txt or /InputAddress=""Single Address To Check"" ONE REQUIRED"
-		.echo "	    /Verbose:True|False  optional.  Default is False"
-		.echo "	      (Verbose optimized for minimum 150 character wide window)"
-		.echo "	      (Verbose Output has the Canada Post address truncated when result code is 0)"
-		.echo "	    /OutputFile:FileName.txt"
-		.echo "	      (File Output does not have the Canada Post address truncated when result code is 0)"
-		.echo	"	      (.txt suffix not required)"
-		.echo	"	      (if file exists it will be overwritten)"
+		.echo "	    /IF:FileName.txt                  : Input file (required if /IA not used"
+		.echo "	    /IA=""Single Address To Check""     : Just check one address (Required if /IF not used"
+		.echo "	    /V:True|False                     : Verbose. optional.  Default is False"
+		.echo "	                                        (Verbose optimized for minimum 150 character wide window)"
+		.echo "	                                        (Verbose Output has the Canada Post address truncated when result code is 0)"
+		.echo "	    /OF:FileName.txt                  : Output File"
+		.echo "	                                        (File Output does not have the Canada Post address truncated when result code is 0)"
+		.echo	"	                                        (.txt suffix not required)"
+		.echo	"	                                        (if file exists it will be overwritten)"
+		.echo "	    /S                                : Silent.  Cannot be used with verbose."
+		.echo	"	                                        (does not show progress of file processing when /IF is used)"
 	end with
 		
 end sub
@@ -303,7 +310,7 @@ Sub OutputNotes
 		.echo "	  Designated multiple dwelling addresses without the suite number return code 0"
 		.echo "	  Do not include postal codes with addresses.  They will resolve to 0."
 		.echo "		"
-		.echo "		Debug:  If a line in the input file begins with ""comment"" it will be output to the screen in verbose mode"
+		.echo "	  Debug:  If a line in the input file begins with ""comment"" it will be output to the screen in verbose mode"
 	end with 
 	
 end Sub
