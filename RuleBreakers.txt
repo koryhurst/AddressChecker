@@ -1,0 +1,13 @@
+An apartment building that returns a "B" and a 7 digit suffix.  Without a suite number.
+2472 West 4th Avenue, Vancouver, BC
+
+Study these.  Is there a way to get the first 2 to show up as 
+incorrect and the 3rd to show up as correct.  The first 2 found 
+the wrong address and the 3rd found the right one.
+The first 2 are particularly badly formed, so not that serious
+any address should have at least the town and the province.
+
+58 kimber
+58 kimberl
+58 Kimberly kapuskasing
+58 Kimberly Dr, Kapuskasing, ON

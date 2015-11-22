@@ -125,11 +125,15 @@ if bClearedToProceed = True then
 			end if 
 			sFileRow = oInputFile.ReadLine
 			'this if is just to allow blank rows in the source file for testing purposes
-			if sFileRow <> ""  then 
+			if left(sFileRow, 7) = "Comment"  then 
+				if bVerbose = 1 then
+					wscript.echo sFileRow
+				end if
+			elseif sFileRow <> "" then
 				sURL = BuildCanadaPostURL(sFileRow)
 				sReturned = GetResultFromURL(sURL)
 				call ProcessSingleAddress(sFileRow, sReturned, aFieldWidths, oOutputFile, sOutputType, bVerbose)
-			else
+			else 
 				if bVerbose = 1 then
 					wscript.echo ""
 				end if
@@ -298,7 +302,7 @@ Sub OutputNotes
 		.echo "		"
 		.echo "	  Designated multiple dwelling addresses without the suite number return code 0"
 		.echo "	  Do not include postal codes with addresses.  They will resolve to 0."
-		.echo "		"
+		.echo "		Debug:  if the a line in the input file begins with ""comment"" it will be output to the screen in verbose mode"
 	end with 
 	
 end Sub

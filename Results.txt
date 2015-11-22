@@ -5,6 +5,8 @@
 "2977 East 29th Avenue, Vancouver, BC";"1";"1";"CAN|B|3696653";"2977 29th Ave E, Vancouver, BC";
 "2977 29th Av E, Vancouver, BC";"1";"1";"CAN|B|3696653";"2977 29th Ave E, Vancouver, BC";
 "2977 29th Ave E, Vancouver, BC";"2";"1";"CAN|B|3696653";"2977 29th Ave E, Vancouver, BC";
+"2977 29th Ave E, Vancouver, BC, V5R1V8";"0";"2";"CAN|B|3696653";"2977 29th Ave E, Vancouver, BC";
+"2977 29th Ave E, Vancouver, BC, V5R 1V8";"1";"1";"CAN|B|3696653";"V5R 1V8, 2977, 29th Ave E, Vancouver, BC ";
 "58 kimber";"1";"1";"CAN|B|1759531";"58 Kimberley Ave, Kemptville, ON";
 "58 kimberl";"1";"1";"CAN|B|1759531";"58 Kimberley Ave, Kemptville, ON";
 "58 Kimberly kapuskasing";"1";"1";"CAN|B|3707478";"58 Kimberly Dr, Kapuskasing, ON";
@@ -17,7 +19,6 @@
 "103 2960 29th Ave E, Vancouver, BC";"2";"1";"CAN|B|7600079";"103 2960 29th Ave E, Vancouver, BC";
 "2138 Madison Ave, Burnaby, BC";"0";"1";"CAN|1|57|577|44";"2138 Madison Ave, Burnaby, BC";
 "2501 2138 Madison Ave, Burnaby, BC";"2";"1";"CAN|B|4176487";"2501 2138 Madison Ave, Burnaby, BC";
-"2565 Cornwall Avenue, Vancouver, BC, V6K1C1, CA";"0";"1";"CAN|1|433|339|88";"2565 Cornwall Ave, Vancouver, BC";
 "2565 Cornwall Avenue, Vancouver, BC";"0";"1";"CAN|1|433|339|88";"2565 Cornwall Ave, Vancouver, BC";
 "1610 Haro Street, Vancouver, BC";"0";"2";"CAN|1|433|556|49";"1610 Haro St, Vancouver, BC";
 "1718 Henderson lake blvd. S, Lethbridge, AB";"0";"1";"CAN|0|353|262|75";"1718 Henderson Lake Blvd S, Lethbridge, AB";

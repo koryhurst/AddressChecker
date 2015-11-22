@@ -1,19 +1,25 @@
+Comment:  Totally Wrong Address
 2958 29th Ave East, Vancouver, BC
-
+Comment:  Totally Correct Address
 44 Eldorado Close NE, Calgary, AB
-
+Comment:  Bunch Of close addresses that match, followed by the perfect match
 2977 29th Ave East, Vancouver, BC
 2977 East 29th Av, Vancouver, BC
 2977 East 29th Avenue, Vancouver, BC
 2977 29th Av E, Vancouver, BC
 2977 29th Ave E, Vancouver, BC
-
-
+Comment:  Don't include Postal Codes!
+2977 29th Ave E, Vancouver, BC, V5R1V8
+Comment:  Unless you include the space!
+2977 29th Ave E, Vancouver, BC, V5R 1V8
+Comment:  Example of 2 really badly formed addresses (that return 1)
+Comment:  Followed by one I wish could be distinguished from the previous 2
+Comment:  Followed by the perfect 
 58 kimber
 58 kimberl
 58 Kimberly kapuskasing
 58 Kimberly Dr, Kapuskasing, ON
-
+Comment:  Suite Number vs Non Suite Number Examples
 933 Seymour St, Vancouver
 1101 933 Seymour St, Vancouver
 1101 933 Seymour St, Vancouver, BC
@@ -22,11 +28,9 @@
 103 2960 29th Ave E, Vancouver, BC
 2138 Madison Ave, Burnaby, BC
 2501 2138 Madison Ave, Burnaby, BC
-
-2565 Cornwall Avenue, Vancouver, BC, V6K1C1, CA
-
+Comment:  Other Apartment Buildings
 2565 Cornwall Avenue, Vancouver, BC
 1610 Haro Street, Vancouver, BC
 1718 Henderson lake blvd. S, Lethbridge, AB
-
+Comment:  The Apartment Building Exception.  This results in 2. When it should not.
 2472 West 4th Avenue, Vancouver, BC
