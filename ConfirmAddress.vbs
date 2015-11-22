@@ -36,6 +36,9 @@ bParametersOK = CheckParameters(colNamedArguments)
 bCurlVersionOK = CurlVersionHandlesHTTPS
 bClearedToProceed = bParametersOK and bCurlVersionOK
 
+call OutputUsage
+call OutputNotes
+
 if bClearedToProceed = True then 
 	with colNamedArguments
 		'wscript.echo .Exists("InputFile")
@@ -59,11 +62,7 @@ if bClearedToProceed = True then
 	else 
 		bVerbose = 0
 	end if
-	
-	if bVerbose = 1 then 
-		call OutputNotes
-	end if
-	
+
 	if sInputType = "File" or sOutputType = "File" then
 		set fso = CreateObject("Scripting.FileSystemObject")
 		if sInputType = "File" then
@@ -85,18 +84,19 @@ if bClearedToProceed = True then
 	aFieldWidths(3) = 18
 	aFieldWidths(4) = 54
 
+	if bVerbose = 1 then 
+		call OutputHeader(aFieldWidths)
+	end if
+
 	if sInputType = "SingleAddress" then
 		'URL Encode the passed in address
 		sURL = BuildCanadaPostURL(sInputAddress)
 		sReturned = GetResultFromURL(sURL)
 		'wscript.echo sReturned
-		call OutputHeader(aFieldWidths)
-		call ProcessSingleAddress(sInputAddress, sReturned, aFieldWidths)
+		call ProcessSingleAddress(sInputAddress, sReturned, aFieldWidths, oOutputFile, sOutputType, bVerbose)
 	else
+		'This variable should be renamed and the dim moved to the top
 		dim sFileRow ' as string
-		if bVerbose = 1 then 
-			call OutputHeader(aFieldWidths)
-		end if
 		Do While oInputFile.AtEndOfStream <> True
 			sFileRow = oInputFile.ReadLine
 			'this if is just to allow blank rows in the source file for testing purposes
@@ -189,13 +189,11 @@ function CheckParameters(byval colNamedArguments)
 		if .Exists("InputFile") = 0 and .Exists("InputAddress") = 0 then 
 			With wscript
 				.echo "Error One of the parameters InputFile or InputAddress is required"
-				call OutputUsage
 				.quit
 			end with
 		elseif .Exists("InputFile") = -1 and .Exists("InputAddress") = -1 then 
 			With wscript
 				.echo "Either the parameter InputFile or the parameter InputAddress is required"
-				call OutputUsage
 				.quit
 			end with	
 		end if
@@ -239,32 +237,32 @@ end sub
 Sub OutputUsage
 		
 	with wscript
-		.echo "Usage: "
-		.echo "  cscript ConfirmAddress.vbs params"
-		.echo "  params:"
-		.echo "  /InputFile:FileName.txt or /InputAddress=""Single Address To Check"" ONE REQUIRED"
-		.echo "  /Verbose:True|False  optional.  Default is False"
-		.echo "    (Verbose optimized for minimum 150 character wide window)"
-		.echo "  /OutputFile:FileName.txt"
-		.echo	"		 (.txt suffix not required)"
-		.echo	"		 (if file exists it will be overwritten)"
+		.echo "	Usage: "
+		.echo "		cscript ConfirmAddress.vbs params"
+		.echo "			params:"
+		.echo "				/InputFile:FileName.txt or /InputAddress=""Single Address To Check"" ONE REQUIRED"
+		.echo "				/Verbose:True|False  optional.  Default is False"
+		.echo "					(Verbose optimized for minimum 150 character wide window)"
+		.echo "					(Verbose Output has the Canada Post address truncated when result code is 0)"
+		.echo "				/OutputFile:FileName.txt"
+		.echo "					(File Output does not have the Canada Post address truncated when result code is 0)"
+		.echo	"					(.txt suffix not required)"
+		.echo	"					(if file exists it will be overwritten)"
 	end with
-	call OutputNotes
 		
 end sub
 
 Sub OutputNotes
 	
 	with wscript
-		.echo "Notes: "
-		.echo "Result Code 2:  Valid Address.  A perfect match was found"
-		.echo "Result Code 1:  Valid Address.  A single possible address was found.  Not a perfect match to search term."
-		.echo "Result Code 0:  No distinct address found.  Address too poorly formed or not a valid address.  "
-		.echo " "
-		.echo "Designated multiple dwelling addresses without the suite number return code 0"
-		.echo " "
-		.echo "Verbose Output has the result address truncated if necessary while output to file does not truncate"
-		.echo " "
+		.echo "		"
+		.echo "		Notes: "
+		.echo "		Result Code 2:  Valid Address.  A perfect match was found"
+		.echo "		Result Code 1:  Valid Address.  A single possible address was found.  Not a perfect match to search term."
+		.echo "		Result Code 0:  No distinct address found.  Address too poorly formed or not a valid address."
+		.echo "		"
+		.echo "		Designated multiple dwelling addresses without the suite number return code 0"
+		.echo "		"
 	end with 
 	
 end Sub
