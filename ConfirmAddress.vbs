@@ -86,11 +86,11 @@ if bClearedToProceed = True then
 	end if
 				
 	redim aFieldWidths(4)
-	aFieldWidths(0) = 54
+	aFieldWidths(0) = 51
 	aFieldWidths(1) = 8
 	aFieldWidths(2) = 12
 	aFieldWidths(3) = 18
-	aFieldWidths(4) = 54
+	aFieldWidths(4) = 51
 
 	'wscript.echo "Query Type:  " & sInputType
 	
@@ -276,9 +276,10 @@ sub OutputHeader(byval aFieldWidths)
 end sub
 
 Sub OutputUsage
-		
+
+	dim iTotalWidth: iTotalWidth = 140
 	with wscript
-		.echo "		"
+		.echo string(iTotalWidth, "=")
 		.echo "	Usage: "
 		.echo "	  cscript ConfirmAddress.vbs params"
 		.echo "	  params:"
@@ -298,7 +299,8 @@ Sub OutputUsage
 end sub
 
 Sub OutputNotes
-	
+
+	dim iTotalWidth: iTotalWidth = 140	
 	with wscript
 		.echo "		"
 		.echo "	Notes: "
@@ -311,7 +313,10 @@ Sub OutputNotes
 		.echo "	  Do not include postal codes with addresses.  They will resolve to 0."
 		.echo "		"
 		.echo "	  Debug:  If a line in the input file begins with ""comment"" it will be output to the screen in verbose mode"
-	end with 
+		.echo string(iTotalWidth, "=")
+		.echo "		"
+		
+		end with 
 	
 end Sub
 
